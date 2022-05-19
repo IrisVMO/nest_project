@@ -5,8 +5,11 @@ import {
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { Photo } from '../photos/photos.entity';
+import { User } from '../users/users.entity';
 
 export enum Status {
   Public = 'Public',
@@ -39,4 +42,8 @@ export class Album {
 
   @OneToMany(() => Photo, (photo) => photo.album)
   photos: Photo[];
+
+  @ManyToMany(() => User)
+  @JoinTable({ name: 'Album_User' })
+  users: User[];
 }

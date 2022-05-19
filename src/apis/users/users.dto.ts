@@ -38,13 +38,32 @@ export class Logindto {
   password: string;
 }
 
-export class Updatedto {
+export class UpdateInfordto {
   @ApiProperty({ example: 'Iris123' })
-  @IsString()
-  @MaxLength(40)
   userName: string;
 
   @ApiProperty({ example: 'iris123@gmail.com' })
-  @IsEmail()
   email: string;
+}
+
+export class GetOneUser {
+  @ApiProperty()
+  id: string;
+}
+
+export class ChangePassworddto {
+  @ApiProperty()
+  @IsString()
+  @MinLength(6)
+  currentPassword: string;
+
+  @ApiProperty()
+  @IsString()
+  @MinLength(6)
+  newPassword: string;
+}
+
+export class DeleteOneUser {
+  @ApiProperty()
+  id: string;
 }

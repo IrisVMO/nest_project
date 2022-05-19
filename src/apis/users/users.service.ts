@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './users.entity';
 import * as bcrypt from 'bcrypt';
-import { Signupdto } from './users.dto';
 
 @Injectable()
 export class UsersService {
@@ -12,7 +11,7 @@ export class UsersService {
     private readonly usersRepository: Repository<User>,
   ) {}
 
-  public async create(createUserDto: Signupdto) {
+  public async create(createUserDto: any) {
     const user = new User();
     user.username = createUserDto.username;
     user.email = createUserDto.email;
@@ -22,14 +21,12 @@ export class UsersService {
     return rs;
   }
 
-  public async findAll() {
+  public async findAllUser() {
     return await this.usersRepository.find();
   }
 
-  public async findOne(filter: any) {
+  public async findOneUser(filter: any) {
     const { id, username, email } = filter;
-    console.log('filter:', filter);
-    console.log('email:', filter.email);
 
     if (!id) {
       const rs = await this.usersRepository.findOne({
@@ -39,12 +36,55 @@ export class UsersService {
     }
 
     const rs = await this.usersRepository.findOne(id);
-    console.log('rs:', rs);
+    return rs;
+  }
+
+  public async findAuth(filter: any) {
+    const { id, index } = filter;
+
+    const rs = await this.usersRepository.findOne({ where: { id, index } });
+    return rs;
+  }
+
+  public async updateInforService(updateUserDto: any) {
+    const { id, username, tokenVerify, email } = updateUserDto;
+
+    const user = await this.usersRepository.findOne(id);
+    user.email = email;
+    user.username = username;
+    user.tokenVerify = tokenVerify;
+
+    const rs = await this.usersRepository.save(user);
 
     return rs;
   }
 
-  public async remove(id: string) {
+  public async verifyAccount(id: any) {
+    const user = await this.usersRepository.findOne(id);
+    user.tokenVerify = null;
+
+    const rs = await this.usersRepository.save(user);
+    return rs;
+  }
+
+  public async changePasswordService(filter: any) {
+    const { id, newPassword, index } = filter;
+    const password = bcrypt.hashSync(newPassword, 10);
+    console.log('info:', filter);
+
+    const user = await this.usersRepository.findOne(id);
+    console.log(user);
+
+    user.index = index;
+    user.password = password;
+
+    const rs = await this.usersRepository.save(user);
+    console.log('update', rs);
+
+    return rs;
+  }
+
+  public async remove(id: any) {
     await this.usersRepository.delete(id);
   }
 }

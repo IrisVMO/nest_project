@@ -10,8 +10,8 @@ import { User } from '../users/users.entity';
 
 @Entity({ name: 'Like' })
 export class Like {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @CreateDateColumn({ name: 'Created_At', type: 'timestamp' })
   createdAt: Date;

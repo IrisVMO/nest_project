@@ -11,8 +11,8 @@ import { Photo } from '../photos/photos.entity';
 
 @Entity({ name: 'Comment' })
 export class Comment {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   comment: string;

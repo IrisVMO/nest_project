@@ -11,7 +11,7 @@ const jwtAccessKey = process.env.JWT_KEY_ACCESS;
 const jwtRefreshKey = process.env.JWT_KEY_REFRESH;
 const expiresIn = process.env.EXPIRESIN;
 const emailHelper = process.env.EMAIL;
-const passwordEmail = process.env.PASSWORD;
+const emailPassword = process.env.PASSWORD_EMAIL;
 
 const APIResponse = class {
   success: boolean;
@@ -33,7 +33,7 @@ export const configs = {
   jwtRefreshKey,
   expiresIn,
   emailHelper,
-  passwordEmail,
+  emailPassword,
   APIResponse,
   db: {
     type: String(process.env.DB_TYPE),

@@ -8,13 +8,11 @@ import { PhotosModule } from './apis/photos/photos.module';
 import { LikesModule } from './apis/likes/likes.module';
 import { CommentsModule } from './apis/comments/comments.module';
 import { FollowsModule } from './apis/follows/follows.module';
-import { AuthModule } from './apis/auth/auth.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: ['.env'] }),
     TypeOrmModule.forRoot(configs.db),
-    AuthModule,
     UsersModule,
     AlbumsModule,
     PhotosModule,

@@ -1,9 +1,9 @@
-import { UsersModule } from '../users/users.module';
 import { forwardRef, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
 import { configs } from '../../configs/config';
+import { UsersModule } from '../users/users.module';
 console.log(UsersModule);
 
 @Module({

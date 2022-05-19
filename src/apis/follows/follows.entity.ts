@@ -3,14 +3,14 @@ import { User } from '../users/users.entity';
 
 @Entity({ name: 'Follow' })
 export class Follow {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  @Column({ generated: 'uuid' })
-  userIdFollowTo: string;
+  @Column('text', { generated: 'uuid', array: true, default: '{}' })
+  userIdFollower: string[];
 
-  @Column({ generated: 'uuid' })
-  userIdFollowFrom: string;
+  @Column('text', { generated: 'uuid', array: true, default: '{}' })
+  userIdFollowing: string[];
 
   @ManyToOne(() => User, (user) => user.follows)
   user: User;

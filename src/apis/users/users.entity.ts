@@ -3,13 +3,9 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   OneToMany,
-  ManyToMany,
-  JoinTable,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { ApiProperty } from '@nestjs/swagger';
-import { Album } from '../albums/albums.entity';
 import { Like } from '../likes/likes.entity';
 import { Comment } from '../comments/comments.entity';
 import { Follow } from '../follows/follows.entity';
@@ -24,19 +20,21 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ApiProperty()
   @Column()
   username: string;
 
-  @ApiProperty()
   @Column()
   email: string;
 
-  @ApiProperty()
   @Column()
   password: string;
 
-  @ApiProperty()
+  @Column({ nullable: true })
+  index: number;
+
+  @Column({ nullable: true })
+  tokenVerify: string;
+
   @Column({
     type: 'enum',
     enum: Status,
@@ -58,8 +56,4 @@ export class User {
 
   @OneToMany(() => Like, (like) => like.user)
   likes: Like[];
-
-  @ManyToMany(() => Album, { eager: true })
-  @JoinTable({ name: 'Album_User' })
-  albums: Album[];
 }

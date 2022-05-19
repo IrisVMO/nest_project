@@ -10,66 +10,198 @@ import {
   Param,
   Post,
   Req,
+  UseInterceptors,
+  UploadedFile,
+  Patch,
+  Inject,
 } from '@nestjs/common';
+import {
+  Signupdto,
+  Logindto,
+  UpdateInfordto,
+  ChangePassworddto,
+  GetOneUser,
+  DeleteOneUser,
+} from './users.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
+import { diskStorage } from 'multer';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
-import { Signupdto, Logindto } from './users.dto';
 import { UsersService } from './users.service';
+import { MailService } from '../../configs/mail/mail.service';
+import { configs } from '../../configs/config';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { editFileName, imageFileFilter } from '../../configs/uploadFile';
 
+@ApiTags('Users')
 @Controller('api/users')
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
+    @Inject(JwtService)
     private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
   ) {}
+
+  @Post('avatar')
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './files',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  async uploadedFile(@UploadedFile() file, @Body() body) {
+    const response = {
+      body,
+      originalname: file.originalname,
+      filename: file.filename,
+    };
+    return response;
+  }
 
   @Post('signup')
   public async sigup(@Body() createUserDto: Signupdto, @Res() res) {
-    const data = await this.usersService.create(createUserDto);
-    return res.json(data);
+    const isExistEmail = await this.usersService.findOneUser({
+      email: createUserDto.email,
+    });
+
+    if (isExistEmail) {
+      throw new HttpException('Email already exists', HttpStatus.CONFLICT);
+    }
+
+    const isExistUsername = await this.usersService.findOneUser({
+      username: createUserDto.username,
+    });
+
+    if (isExistUsername) {
+      throw new HttpException('Username already exists', HttpStatus.CONFLICT);
+    }
+
+    const user = await this.usersService.create(createUserDto);
+    const { id } = user;
+    const tokenVerify = this.jwtService.sign({ id });
+    const option = {
+      from: configs.emailHelper,
+      to: user.email,
+      subject: 'Wellcom to UNIVERSE PHOTOS',
+      html: `<p>
+          Please verify your account
+          <a href='http://${configs.host}:${configs.port}/api/users/verify/${tokenVerify}'>Verify Account</a>
+        </p>`,
+    };
+
+    await this.usersService.updateInforService({ tokenVerify, id });
+    this.mailService.sendMail(option);
+
+    res.json({ data: user });
+  }
+
+  @Get('verifyAcount')
+  public async verifyAccount(@Res() res) {
+    const id = '';
+    const data = await this.usersService.verifyAccount(id);
+    res.json(data);
   }
 
   @Post('login')
   public async Login(@Body() loginDto: Logindto, @Res() res) {
-    const user = await this.usersService.findOne(loginDto);
+    const user = await this.usersService.findOneUser(loginDto);
+
     if (!user) {
-      throw new HttpException(
-        'username or password wrong',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException('Email or username wrong', HttpStatus.NOT_FOUND);
     }
+    // if (user.tokenVerify) {
+    //   throw new HttpException('Please verify account', HttpStatus.BAD_REQUEST);
+    // }
 
     const result = bcrypt.compareSync(loginDto.password, user.password);
-    if (!result) {
-      throw new HttpException(
-        'Username or password wrong',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-    const { id } = user;
-    const accessToken = this.jwtService.sign({ id });
 
-    return res.json(HttpStatus.OK, { data: user, accessToken });
+    if (!result) {
+      throw new HttpException('Password wrong', HttpStatus.NOT_FOUND);
+    }
+
+    const { id, index } = user;
+    const accessToken = this.jwtService.sign({ id, index });
+
+    res.json({ data: user, accessToken });
   }
 
-  @UseGuards(AuthGuard())
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(AuthGuard('jwt'))
   @Get()
   public async findAll(@Res() res) {
-    const data = await this.usersService.findAll();
-    return res.json(HttpStatus.OK, data);
+    const data = await this.usersService.findAllUser();
+    res.json(data);
   }
 
-  @UseGuards(AuthGuard())
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(AuthGuard('jwt'))
   @Get(':id')
-  public async findOne(@Param('id') id: string, @Res() res, @Req() req) {
-    return res.json(HttpStatus.OK, req.user);
+  public async findOne(@Param('id') id: GetOneUser, @Res() res) {
+    console.log(id);
+
+    const user = await this.usersService.findOneUser({ id });
+    console.log('user', user);
+
+    res.json(user);
   }
 
-  @UseGuards(AuthGuard())
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(AuthGuard('jwt'))
+  @Patch()
+  public async updateInfor(
+    @Body() updateUserDto: UpdateInfordto,
+    @Res() res,
+    @Req() req,
+  ) {
+    const { id } = req.user;
+    const data = await this.usersService.updateInforService({
+      ...updateUserDto,
+      id,
+    });
+
+    res.json({ data });
+  }
+
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(AuthGuard('jwt'))
+  @Patch('changePassword')
+  public async changePassword(
+    @Body() changePassworddto: ChangePassworddto,
+    @Res() res,
+    @Req() req,
+  ) {
+    const { currentPassword, newPassword } = changePassworddto;
+    const { id } = req.user;
+    const user = await this.usersService.findOneUser({ id });
+    const { password } = user;
+
+    const result = bcrypt.compareSync(currentPassword, password);
+
+    if (!result) {
+      throw new HttpException('Password wrong', HttpStatus.NOT_FOUND);
+    }
+
+    const index = Math.floor(Math.random() * 10000);
+
+    const data = await this.usersService.changePasswordService({
+      newPassword,
+      id,
+      index,
+    });
+
+    res.json({ data });
+  }
+
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
-  public async remove(@Param('id') id: string, @Res() res) {
+  public async remove(@Param('id') id: DeleteOneUser, @Res() res) {
     const data = await this.usersService.remove(id);
-    return res.json(HttpStatus.OK, data);
+    res.json(HttpStatus.OK, data);
   }
 }
