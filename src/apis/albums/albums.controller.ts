@@ -39,11 +39,11 @@ export class AlbumsController {
     @Res() res,
     @Req() req,
   ) {
-    const { id: userId } = req.user;
     const album = await this.albumsService.createAlbumService(
       createAlbumDto,
-      userId,
+      req.user,
     );
+
     res.json({ album });
   }
 

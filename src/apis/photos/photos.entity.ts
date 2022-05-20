@@ -10,6 +10,7 @@ import {
 import { Album } from '../albums/albums.entity';
 import { Comment } from '../comments/comments.entity';
 import { Like } from '../likes/likes.entity';
+import { User } from '../users/users.entity';
 
 export enum Status {
   Public = 'Public',
@@ -42,6 +43,9 @@ export class Photo {
 
   @ManyToOne(() => Album, (album) => album.photos)
   album: Album;
+
+  @ManyToOne(() => User, (user) => user.photos)
+  user: User;
 
   @OneToMany(() => Like, (like) => like.photo)
   likes: Like[];

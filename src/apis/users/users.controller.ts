@@ -10,8 +10,8 @@ import {
   Param,
   Post,
   Req,
-  UseInterceptors,
-  UploadedFile,
+  // UseInterceptors,
+  // UploadedFile,
   Patch,
   Inject,
 } from '@nestjs/common';
@@ -25,14 +25,11 @@ import {
 } from './users.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
-import { diskStorage } from 'multer';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
 import { MailService } from '../../configs/mail/mail.service';
 import { configs } from '../../configs/config';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { editFileName, imageFileFilter } from '../../configs/uploadFile';
 
 @ApiTags('Users')
 @Controller('api/users')
@@ -43,25 +40,6 @@ export class UsersController {
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
   ) {}
-
-  @Post('avatar')
-  @UseInterceptors(
-    FileInterceptor('image', {
-      storage: diskStorage({
-        destination: './files',
-        filename: editFileName,
-      }),
-      fileFilter: imageFileFilter,
-    }),
-  )
-  async uploadedFile(@UploadedFile() file, @Body() body) {
-    const response = {
-      body,
-      originalname: file.originalname,
-      filename: file.filename,
-    };
-    return response;
-  }
 
   @Post('signup')
   public async sigup(@Body() createUserDto: Signupdto, @Res() res) {
@@ -95,7 +73,7 @@ export class UsersController {
     };
 
     await this.usersService.updateInforService({ tokenVerify, id });
-    this.mailService.sendMail(option);
+    // this.mailService.sendMail(option);
 
     res.json({ data: user });
   }

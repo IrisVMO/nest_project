@@ -9,9 +9,7 @@ export class MailService {
     console.log(option);
     this.mailerService
       .sendMail(option)
-      .then(() => {
-        console.log('Send mail for acount active successfully');
-      })
+      .then()
       .catch((err) => {
         console.log(err);
       });

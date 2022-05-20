@@ -1,7 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 // import { IsNotEmpty, IsString, IsUUID, MaxLength } from 'class-validator';
 
-export class Followdto {
+export class Commnetdto {
   @ApiProperty()
-  userIdFollowing: string;
+  comment: string;
+
+  @ApiProperty()
+  photoId: string;
 }

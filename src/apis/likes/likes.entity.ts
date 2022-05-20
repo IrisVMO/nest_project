@@ -1,9 +1,10 @@
 import {
   Entity,
-  PrimaryGeneratedColumn,
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  Column,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Photo } from '../photos/photos.entity';
 import { User } from '../users/users.entity';
@@ -12,6 +13,12 @@ import { User } from '../users/users.entity';
 export class Like {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column({ generated: 'uuid' })
+  userId: string;
+
+  @Column({ generated: 'uuid' })
+  photoId: string;
 
   @CreateDateColumn({ name: 'Created_At', type: 'timestamp' })
   createdAt: Date;

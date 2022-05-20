@@ -8,6 +8,7 @@ import { PhotosModule } from './apis/photos/photos.module';
 import { LikesModule } from './apis/likes/likes.module';
 import { CommentsModule } from './apis/comments/comments.module';
 import { FollowsModule } from './apis/follows/follows.module';
+import { PostsService } from './posts/posts.service';
 
 @Module({
   imports: [
@@ -20,5 +21,6 @@ import { FollowsModule } from './apis/follows/follows.module';
     CommentsModule,
     FollowsModule,
   ],
+  providers: [PostsService],
 })
 export class AppModule {}

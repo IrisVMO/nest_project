@@ -35,7 +35,10 @@ export class UsersService {
       return rs;
     }
 
-    const rs = await this.usersRepository.findOne(id);
+    const rs = await this.usersRepository.findOne({
+      where: { id },
+      relations: ['follows'],
+    });
     return rs;
   }
 

@@ -1,15 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { forwardRef, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { UsersModule } from '../src/apis/users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Signupdto } from '../src/apis/users/users.dto';
 import { AuthModule } from '../src/apis/auth/auth.module';
+import { AlbumsModule } from '../src/apis/albums/albums.module';
+import { CommentsModule } from '../src/apis/comments/comments.module';
+import { FollowsModule } from '../src/apis/follows/follows.module';
+import { LikesModule } from '../src/apis/likes/likes.module';
+import { PhotosModule } from '../src/apis/photos/photos.module';
 
 describe('Users - /users (e2e)', () => {
   const user = {
-    username: 'nam',
-    email: 'nam@gmail.com',
+    username: 'nsa2me',
+    email: 'naes2m@gmail.com',
     password: '123456',
   };
 
@@ -18,8 +23,6 @@ describe('Users - /users (e2e)', () => {
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
-        AuthModule,
-        UsersModule,
         TypeOrmModule.forRoot({
           type: 'postgres',
           synchronize: true,
@@ -31,6 +34,14 @@ describe('Users - /users (e2e)', () => {
           database: 'album_nest',
           autoLoadEntities: true,
         }),
+        forwardRef(() => AuthModule),
+        forwardRef(() => UsersModule),
+        UsersModule,
+        AlbumsModule,
+        PhotosModule,
+        LikesModule,
+        CommentsModule,
+        FollowsModule,
       ],
     }).compile();
 

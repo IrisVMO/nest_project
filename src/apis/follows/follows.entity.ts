@@ -1,17 +1,29 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  Unique,
+} from 'typeorm';
 import { User } from '../users/users.entity';
 
 @Entity({ name: 'Follow' })
+@Unique(['userIdFollowing'])
 export class Follow {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column('text', { generated: 'uuid', array: true, default: '{}' })
-  userIdFollower: string[];
+  @Column({ generated: 'uuid' })
+  userId: string;
 
-  @Column('text', { generated: 'uuid', array: true, default: '{}' })
-  userIdFollowing: string[];
+  @Column('text', {
+    array: true,
+    default: [],
+  })
+  public userIdFollowing: string[];
 
-  @ManyToOne(() => User, (user) => user.follows)
+  @OneToOne(() => User, (user) => user.follows)
+  @JoinColumn()
   user: User;
 }

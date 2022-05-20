@@ -1,10 +1,10 @@
 import {
   Column,
   Entity,
-  PrimaryGeneratedColumn,
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../users/users.entity';
 import { Photo } from '../photos/photos.entity';

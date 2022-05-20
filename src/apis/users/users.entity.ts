@@ -5,10 +5,12 @@ import {
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToOne,
 } from 'typeorm';
 import { Like } from '../likes/likes.entity';
 import { Comment } from '../comments/comments.entity';
 import { Follow } from '../follows/follows.entity';
+import { Photo } from '../photos/photos.entity';
 
 export enum Status {
   Public = 'Public',
@@ -48,7 +50,7 @@ export class User {
   @UpdateDateColumn({ name: 'Updated_At', type: 'timestamp' })
   updatedAt: Date;
 
-  @OneToMany(() => Follow, (follow) => follow.user)
+  @OneToOne(() => Follow, (follow) => follow.user)
   follows: Follow[];
 
   @OneToMany(() => Comment, (comment) => comment.user)
@@ -56,4 +58,7 @@ export class User {
 
   @OneToMany(() => Like, (like) => like.user)
   likes: Like[];
+
+  @OneToMany(() => Photo, (photo) => photo.user)
+  photos: Photo[];
 }
