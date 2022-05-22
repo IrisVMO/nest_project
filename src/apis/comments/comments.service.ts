@@ -8,7 +8,7 @@ import {
   UpdateCommentdto,
   DeleteCommentdto,
   GetAllCommentPhoto,
-} from './comment.dto';
+} from './comments.dto';
 
 @Injectable()
 export class CommentsService {

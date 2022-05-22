@@ -21,9 +21,9 @@ export class FollowsController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Post()
-  @ApiResponse({ status: 200, description: 'Ok.' })
+  @ApiResponse({ status: 201, description: 'Created' })
   @ApiResponse({ status: 400, description: 'Bad request' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async follow(@Body() followdto: Followdto, @Res() res, @Req() req) {
     const data = await this.followsService.follow(followdto, req.user);
 
@@ -33,8 +33,8 @@ export class FollowsController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Get('newFeed')
-  @ApiResponse({ status: 200, description: 'Ok.' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 200, description: 'Ok' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async newFeed(@Req() req, @Res() res) {
     const { id: userId } = req.user;
     const data = await this.followsService.newFeed(userId);
@@ -44,8 +44,9 @@ export class FollowsController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Delete()
-  @ApiResponse({ status: 200, description: 'Ok.' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 200, description: 'Ok' })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async unFollow(
     @Body() unFollowdto: UnFollowdto,
     @Res() res,

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -24,7 +25,12 @@ import { AuthGuard } from '@nestjs/passport';
 import * as path from 'path';
 import { editFileName, imageFileFilter } from '../../configs/uploadFile';
 import { PhotosService } from './photos.service';
-import { GetOnePhotodto, Photodto, UpdatePhotodto } from './photos.dto';
+import {
+  CreatePhotodto,
+  GetOnePhotodto,
+  UpdatePhotodto,
+  DeleteOnePhotodto,
+} from './photos.dto';
 
 @ApiTags('photos')
 @Controller('api/photos')
@@ -34,9 +40,9 @@ export class PhotosController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Post()
-  @ApiResponse({ status: 201, description: 'Created.' })
-  @ApiResponse({ status: 400, description: 'Bad request.' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 201, description: 'Created' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -63,29 +69,23 @@ export class PhotosController {
   )
   public async uploadedFile(
     @UploadedFile() file,
-    @Body() photodto: any,
+    @Body() photodto: CreatePhotodto,
     @Res() res,
     @Req() req,
   ) {
-    console.log(file);
     const link = path.join('./images', file.filename);
-    console.log(photodto, link, req.user);
 
-    const photo = await this.photosService.createPhoto(
-      photodto,
-      link,
-      req.user,
-    );
-    res.json({ photo });
+    const data = await this.photosService.createPhoto(photodto, link, req.user);
+    res.json({ data });
   }
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Patch(':id')
-  @ApiResponse({ status: 201, description: 'Updated.' })
-  @ApiResponse({ status: 400, description: 'Bad request.' })
-  @ApiResponse({ status: 404, description: 'Not found.' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 201, description: 'Updated' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 404, description: 'Not found' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async updatePhoto(
     @Param() id: string,
     @Body() updatePhotodto: UpdatePhotodto,
@@ -98,15 +98,30 @@ export class PhotosController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Get(':id')
-  @ApiResponse({ status: 200, description: 'Ok.' })
-  @ApiResponse({ status: 400, description: 'Bad request.' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 200, description: 'Ok' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async getOnePhoto(
     @Param() getOnePhotodto: GetOnePhotodto,
     @Req() req,
     @Res() res,
   ) {
     const data = await this.photosService.getOnePhoto(getOnePhotodto);
+    res.json({ data });
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Delete(':id')
+  @ApiResponse({ status: 200, description: 'Ok' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  public async deleteOnePhoto(
+    @Param() deleteOnePhotodto: DeleteOnePhotodto,
+    @Req() req,
+    @Res() res,
+  ) {
+    const data = await this.photosService.deleteOnePhoto(deleteOnePhotodto);
     res.json({ data });
   }
 }

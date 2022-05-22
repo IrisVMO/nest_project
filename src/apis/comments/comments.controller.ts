@@ -18,7 +18,7 @@ import {
   UpdateCommentdto,
   DeleteCommentdto,
   GetAllCommentPhoto,
-} from './comment.dto';
+} from './comments.dto';
 
 @ApiTags('Comments')
 @Controller('api/comments')
@@ -41,9 +41,9 @@ export class CommentsController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Get('allCommentInPhoto/:photoId')
-  @ApiResponse({ status: 200, description: 'Ok.' })
+  @ApiResponse({ status: 200, description: 'Ok' })
   @ApiResponse({ status: 400, description: 'Bad request' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async getAllCommentPhoto(
     @Param() getAllCommentPhoto: GetAllCommentPhoto,
     @Res() res,
@@ -57,9 +57,9 @@ export class CommentsController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Patch()
-  @ApiResponse({ status: 200, description: 'Ok.' })
+  @ApiResponse({ status: 200, description: 'Ok' })
   @ApiResponse({ status: 400, description: 'Bad request' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async updateComent(
     @Body() updateCommentdto: UpdateCommentdto,
     @Res() res,
@@ -77,9 +77,9 @@ export class CommentsController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Delete()
-  @ApiResponse({ status: 200, description: 'Ok.' })
+  @ApiResponse({ status: 200, description: 'Ok' })
   @ApiResponse({ status: 400, description: 'Bad request' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async deleteComment(
     @Body() deleteCommentdto: DeleteCommentdto,
     @Res() res,

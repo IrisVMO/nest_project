@@ -1,12 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsUUID } from 'class-validator';
 
 export enum Status {
   Public = 'Public',
   Private = 'Private',
 }
 
-export class Photodto {
+export class CreatePhotodto {
   @ApiProperty()
   caption: string;
 }
@@ -14,11 +14,20 @@ export class Photodto {
 export class GetOnePhotodto {
   @ApiProperty()
   @IsNotEmpty()
+  @IsUUID()
+  id: string;
+}
+
+export class DeleteOnePhotodto {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsUUID()
   id: string;
 }
 
 export class UpdatePhotodto {
   @ApiProperty()
+  @IsNotEmpty()
   caption: string;
 
   @ApiProperty({ enum: Status })

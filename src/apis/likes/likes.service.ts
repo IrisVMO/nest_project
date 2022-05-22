@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Like } from './likes.entity';
-import { CountLikedto, Likedto, UnLikedto } from './like.dto';
+import { CountLikedto, Likedto, UnLikedto } from './likes.dto';
 import { PhotosService } from '../photos/photos.service';
 
 @Injectable()

@@ -20,6 +20,7 @@ import {
   GetAllPhotoInAlbumdto,
   UpdateAlbumdto,
   DeleteAlbumdto,
+  ParamUpdateAlbumdto,
 } from './albums.dto';
 import { MailService } from '../../configs/mail/mail.service';
 
@@ -35,9 +36,9 @@ export class AlbumsController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Post()
-  @ApiResponse({ status: 200, description: 'Ok.' })
+  @ApiResponse({ status: 201, description: 'Created' })
   @ApiResponse({ status: 400, description: 'Bad request' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async createAlbum(
     @Body() createAlbumDto: CreateAlbumDto,
     @Res() res,
@@ -54,9 +55,9 @@ export class AlbumsController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Get(':id')
-  @ApiResponse({ status: 200, description: 'Ok.' })
+  @ApiResponse({ status: 200, description: 'Ok' })
   @ApiResponse({ status: 400, description: 'Bad request' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async getOneAlbum(
     @Res() res,
     @Param() getOneAlbumdto: GetOneAlbumdto,
@@ -68,9 +69,9 @@ export class AlbumsController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Get('allPhotoInAlbum/:id')
-  @ApiResponse({ status: 200, description: 'Ok.' })
+  @ApiResponse({ status: 200, description: 'Ok' })
   @ApiResponse({ status: 400, description: 'Bad request' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async getAllPhotoInAlbum(
     @Res() res,
     @Param() getAllPhotoInAlbumdto: GetAllPhotoInAlbumdto,
@@ -84,26 +85,32 @@ export class AlbumsController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Patch(':id')
-  @ApiResponse({ status: 200, description: 'Ok.' })
+  @ApiResponse({ status: 200, description: 'Ok' })
   @ApiResponse({ status: 400, description: 'Bad request' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async updateAlbum(
     @Body() updateAlbumDto: UpdateAlbumdto,
-    @Param('id') id: string,
+    @Param() paramUpdateAlbumdto: ParamUpdateAlbumdto,
     @Res() res,
   ) {
-    const data = await this.albumsService.updateAlbum(updateAlbumDto, id);
+    const data = await this.albumsService.updateAlbum(
+      updateAlbumDto,
+      paramUpdateAlbumdto,
+    );
     res.json({ data });
   }
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
-  @ApiResponse({ status: 200, description: 'Ok.' })
+  @ApiResponse({ status: 200, description: 'Ok' })
   @ApiResponse({ status: 400, description: 'Bad request' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  public async deleteAlbum(@Res() res, @Param('id') id: DeleteAlbumdto) {
-    const data = await this.albumsService.remove(id);
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  public async deleteAlbum(
+    @Res() res,
+    @Param() deleteAlbumdto: DeleteAlbumdto,
+  ) {
+    const data = await this.albumsService.remove(deleteAlbumdto);
     res.json({ data });
   }
 }

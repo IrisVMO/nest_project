@@ -3,6 +3,7 @@ import {
   IsEmail,
   IsNotEmpty,
   IsString,
+  IsUUID,
   MaxLength,
   MinLength,
 } from 'class-validator';
@@ -28,6 +29,9 @@ export class CreateUserdto {
   @MinLength(6)
   @IsNotEmpty()
   password: string;
+
+  @ApiProperty()
+  env: string;
 }
 
 export class VerifyAccountdto {
@@ -44,9 +48,6 @@ export class Logindto {
   email: string;
 
   @ApiProperty()
-  env: string;
-
-  @ApiProperty()
   @MinLength(6)
   @IsNotEmpty()
   password: string;
@@ -54,7 +55,7 @@ export class Logindto {
 
 export class UpdateInfordto {
   @ApiProperty({ example: 'Iris123' })
-  userName: string;
+  username: string;
 
   @ApiProperty({ example: 'iris123@gmail.com' })
   email: string;
@@ -64,17 +65,21 @@ export class UpdateInfordto {
 }
 
 export class GetOneUserdto {
-  @ApiProperty()
+  @ApiProperty({ nullable: true })
+  @IsUUID()
+  @IsNotEmpty()
   id: string;
 }
 
 export class ChangePassworddto {
   @ApiProperty()
+  @IsNotEmpty()
   @IsString()
   @MinLength(6)
   currentPassword: string;
 
   @ApiProperty()
+  @IsNotEmpty()
   @IsString()
   @MinLength(6)
   newPassword: string;
@@ -82,5 +87,6 @@ export class ChangePassworddto {
 
 export class DeleteOneUser {
   @ApiProperty()
+  @IsNotEmpty()
   id: string;
 }

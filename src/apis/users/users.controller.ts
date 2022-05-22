@@ -41,9 +41,9 @@ export class UsersController {
   ) {}
 
   @Post('signup')
-  @ApiResponse({ status: 201, description: 'Created.' })
-  @ApiResponse({ status: 409, description: 'Confilic.' })
-  @ApiResponse({ status: 400, description: 'Bad request.' })
+  @ApiResponse({ status: 201, description: 'Created' })
+  @ApiResponse({ status: 409, description: 'Confilic' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
   public async sigup(@Body() createUserDto: CreateUserdto, @Res() res) {
     const isExistEmail = await this.usersService.findOneUser({
       email: createUserDto.email,
@@ -63,25 +63,28 @@ export class UsersController {
 
     const user = await this.usersService.create(createUserDto);
     const { id } = user;
-    const tokenVerify = this.jwtService.sign({ id });
-    const option = {
-      from: configs.emailHelper,
-      to: user.email,
-      subject: 'Wellcom to UNIVERSE PHOTOS',
-      html: `<p>
-          Please verify your account
-          <a href='http://${configs.host}:${configs.port}/api/users/verify/${tokenVerify}'>Verify Account</a>
-        </p>`,
-    };
+    const { env } = createUserDto;
+    if (env != 'test') {
+      const tokenVerify = this.jwtService.sign({ id });
+      const option = {
+        from: configs.emailHelper,
+        to: user.email,
+        subject: 'Wellcom to UNIVERSE PHOTOS',
+        html: `<p>
+            Please verify your account
+            <a href='http://${configs.host}:${configs.port}/api/users/verify/${tokenVerify}'>Verify Account</a>
+          </p>`,
+      };
 
-    await this.usersService.updateInforService({ tokenVerify, id });
-    this.mailService.sendMail(option);
+      await this.usersService.updateInforService({ tokenVerify, id });
+      this.mailService.sendMail(option);
+    }
 
     res.json({ data: user });
   }
 
   @Get('verify/:tokenVerify')
-  @ApiResponse({ status: 400, description: 'Bad request.' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
   public async verifyAccount(
     @Param() verifyAccountdto: VerifyAccountdto,
     @Res() res,
@@ -93,10 +96,9 @@ export class UsersController {
   }
 
   @Post('login')
-  @ApiResponse({ status: 200, description: 'Ok.' })
-  @ApiResponse({ status: 400, description: 'Bad request.' })
+  @ApiResponse({ status: 201, description: 'Ok' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
   public async Login(@Body() loginDto: Logindto, @Res() res) {
-    const { env } = loginDto;
     const user = await this.usersService.findOneUser(loginDto);
 
     if (!user) {
@@ -106,13 +108,11 @@ export class UsersController {
       );
     }
 
-    if (env != 'test') {
-      if (user.tokenVerify) {
-        throw new HttpException(
-          'Please verify account',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
+    if (user.tokenVerify) {
+      throw new HttpException(
+        'Please verify account in your email address',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const result = bcrypt.compareSync(loginDto.password, user.password);
@@ -129,32 +129,37 @@ export class UsersController {
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Get()
+  @Get('/all')
+  @ApiResponse({ status: 200, description: 'Ok' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async findAll(@Res() res) {
     const data = await this.usersService.findAllUser();
-    res.json(data);
+    res.json({ data });
   }
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Get(':id')
-  @ApiResponse({ status: 404, description: 'Not found.' })
-  @ApiResponse({ status: 400, description: 'Bad request.' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  public async findOne(@Param('id') id: GetOneUserdto, @Res() res) {
-    const user = await this.usersService.findOneUser({ id });
-    if (!user) {
+  @Get('one/:id')
+  @ApiResponse({ status: 200, description: 'Ok' })
+  @ApiResponse({ status: 404, description: 'Not found' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  public async findOne(@Param() getOneUserdto: GetOneUserdto, @Res() res) {
+    const data = await this.usersService.findOneUser(getOneUserdto);
+
+    if (!data) {
       throw new HttpException('User is not found', HttpStatus.NOT_FOUND);
     }
-    res.json(user);
+
+    res.json({ data });
   }
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Patch('changePassword')
-  @ApiResponse({ status: 201, description: 'Updated.' })
-  @ApiResponse({ status: 400, description: 'Bad request.' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 200, description: 'Updated' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async changePassword(
     @Body() changePassworddto: ChangePassworddto,
     @Res() res,
@@ -185,9 +190,9 @@ export class UsersController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Patch()
-  @ApiResponse({ status: 201, description: 'Updated.' })
-  @ApiResponse({ status: 400, description: 'Bad request.' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 200, description: 'Updated' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async updateInfor(
     @Body() updateUserDto: UpdateInfordto,
     @Res() res,
@@ -205,10 +210,11 @@ export class UsersController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
-  @ApiResponse({ status: 400, description: 'Bad request.' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  public async remove(@Param('id') id: DeleteOneUser, @Res() res) {
-    const data = await this.usersService.remove(id);
-    res.json(data);
+  @ApiResponse({ status: 200, description: 'Ok' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  public async remove(@Param() deleteOneUser: DeleteOneUser, @Res() res) {
+    const data = await this.usersService.remove(deleteOneUser);
+    res.json({ data });
   }
 }

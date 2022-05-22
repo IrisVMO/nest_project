@@ -4,8 +4,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Album } from './albums.entity';
 import {
   CreateAlbumDto,
+  DeleteAlbumdto,
   GetAllPhotoInAlbumdto,
   GetOneAlbumdto,
+  ParamUpdateAlbumdto,
   UpdateAlbumdto,
 } from './albums.dto';
 import { PhotosService } from '../photos/photos.service';
@@ -41,8 +43,12 @@ export class AlbumsService {
     return rs;
   }
 
-  public async updateAlbum(updateAlbumDto: UpdateAlbumdto, id: string) {
+  public async updateAlbum(
+    updateAlbumDto: UpdateAlbumdto,
+    paramUpdateAlbumdto: ParamUpdateAlbumdto,
+  ) {
     const { name, description, status } = updateAlbumDto;
+    const { id } = paramUpdateAlbumdto;
 
     const album = await this.albumsRepository.findOne(id);
     album.name = name;
@@ -54,7 +60,8 @@ export class AlbumsService {
     return rs;
   }
 
-  public async remove(id: any) {
-    await this.albumsRepository.delete(id);
+  public async remove(deleteAlbumdto: DeleteAlbumdto) {
+    const { id } = deleteAlbumdto;
+    await this.albumsRepository.delete({ id });
   }
 }

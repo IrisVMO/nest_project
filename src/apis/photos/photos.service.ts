@@ -1,7 +1,12 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
-import { UpdatePhotodto } from './photos.dto';
+import {
+  CreatePhotodto,
+  DeleteOnePhotodto,
+  GetOnePhotodto,
+  UpdatePhotodto,
+} from './photos.dto';
 import { Photo } from './photos.entity';
 
 @Injectable()
@@ -11,7 +16,7 @@ export class PhotosService {
     private readonly photosRepository: Repository<Photo>,
   ) {}
 
-  public async createPhoto(photodto, link: string, user: any) {
+  public async createPhoto(photodto: CreatePhotodto, link: string, user: any) {
     const { caption } = photodto;
     const photo = new Photo();
     photo.caption = caption;
@@ -52,10 +57,17 @@ export class PhotosService {
     return rs;
   }
 
-  public async getOnePhoto(getOnePhotodto: any) {
+  public async getOnePhoto(getOnePhotodto: GetOnePhotodto) {
     const { id } = getOnePhotodto;
 
-    const photo = await this.photosRepository.findOne(id);
-    return photo;
+    const rs = await this.photosRepository.findOne(id);
+    return rs;
+  }
+
+  public async deleteOnePhoto(deleteOnePhotodto: DeleteOnePhotodto) {
+    const { id } = deleteOnePhotodto;
+
+    const rs = await this.photosRepository.delete({ id });
+    return rs;
   }
 }

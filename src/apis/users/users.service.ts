@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './users.entity';
 import * as bcrypt from 'bcrypt';
-import { CreateUserdto } from './users.dto';
+import { CreateUserdto, DeleteOneUser } from './users.dto';
 
 @Injectable()
 export class UsersService {
@@ -40,7 +40,7 @@ export class UsersService {
     return await this.usersRepository.find();
   }
 
-  public async findOneUser(filter: any) {
+  public async findOneUser(filter) {
     const { id, username, email } = filter;
 
     if (!id) {
@@ -50,10 +50,7 @@ export class UsersService {
       return rs;
     }
 
-    const rs = await this.usersRepository.findOne({
-      where: { id },
-      relations: ['follows'],
-    });
+    const rs = await this.usersRepository.findOne(id);
     return rs;
   }
 
@@ -90,8 +87,10 @@ export class UsersService {
     return rs;
   }
 
-  public async remove(id: any) {
-    const rs = await this.usersRepository.delete(id);
+  public async remove(deleteOneUser: DeleteOneUser) {
+    const { id } = deleteOneUser;
+
+    const rs = await this.usersRepository.delete({ id });
     return rs;
   }
 }
