@@ -5,3 +5,13 @@ export class Likedto {
   @ApiProperty()
   photoId: string;
 }
+
+export class CountLikedto {
+  @ApiProperty()
+  photoId: string;
+}
+
+export class UnLikedto {
+  @ApiProperty()
+  photoId: string;
+}

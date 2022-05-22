@@ -5,10 +5,16 @@ import { AlbumsController } from './albums.controller';
 import { AlbumsService } from './albums.service';
 import { Album } from './albums.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { PhotosModule } from '../photos/photos.module';
 
 @Module({
   controllers: [AlbumsController],
-  imports: [TypeOrmModule.forFeature([Album]), MailModule, AuthModule],
+  imports: [
+    TypeOrmModule.forFeature([Album]),
+    MailModule,
+    AuthModule,
+    PhotosModule,
+  ],
   providers: [AlbumsService],
   exports: [AlbumsService],
 })

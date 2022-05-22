@@ -14,6 +14,12 @@ export class Comment {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ generated: 'uuid' })
+  userId: string;
+
+  @Column({ generated: 'uuid' })
+  photoId: string;
+
   @Column()
   comment: string;
 

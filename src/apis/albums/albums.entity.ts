@@ -16,6 +16,33 @@ export enum Status {
   Private = 'Private',
 }
 
+// export enum inviteStatus {
+//   Active = 'Active',
+//   Inactive = 'Inactive',
+// }
+
+// @Entity({ name: 'Album_User' })
+// export class AlbumUser {
+//   @PrimaryGeneratedColumn('uuid')
+//   id: string;
+
+//   @Column({ generated: 'uuid' })
+//   userId: string;
+
+//   @Column({ generated: 'uuid' })
+//   albumId: string;
+
+//   @Column({ nullable: true })
+//   role: string;
+
+//   @Column({
+//     type: 'enum',
+//     enum: inviteStatus,
+//     nullable: true,
+//   })
+//   status: inviteStatus;
+// }
+
 @Entity({ name: 'Album' })
 export class Album {
   @PrimaryGeneratedColumn('uuid')

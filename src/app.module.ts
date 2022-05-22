@@ -8,12 +8,11 @@ import { PhotosModule } from './apis/photos/photos.module';
 import { LikesModule } from './apis/likes/likes.module';
 import { CommentsModule } from './apis/comments/comments.module';
 import { FollowsModule } from './apis/follows/follows.module';
-import { PostsService } from './posts/posts.service';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: ['.env'] }),
-    TypeOrmModule.forRoot(configs.db),
+    TypeOrmModule.forRoot(configs.dbDev),
     UsersModule,
     AlbumsModule,
     PhotosModule,
@@ -21,6 +20,6 @@ import { PostsService } from './posts/posts.service';
     CommentsModule,
     FollowsModule,
   ],
-  providers: [PostsService],
+  providers: [],
 })
 export class AppModule {}

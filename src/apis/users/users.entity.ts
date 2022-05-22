@@ -13,8 +13,8 @@ import { Follow } from '../follows/follows.entity';
 import { Photo } from '../photos/photos.entity';
 
 export enum Status {
-  Public = 'Public',
-  Private = 'Private',
+  Active = 'Active',
+  Busy = 'Busy',
 }
 
 @Entity({ name: 'User' })
@@ -40,7 +40,7 @@ export class User {
   @Column({
     type: 'enum',
     enum: Status,
-    default: Status.Public,
+    default: Status.Active,
   })
   status: Status;
 

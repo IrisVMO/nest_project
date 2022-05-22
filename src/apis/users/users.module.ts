@@ -6,7 +6,6 @@ import { UsersService } from './users.service';
 import { AuthModule } from '../auth/auth.module';
 import { MailModule } from '../../configs/mail/mail.module';
 import { User } from './users.entity';
-console.log(AuthModule);
 
 @Module({
   controllers: [UsersController],

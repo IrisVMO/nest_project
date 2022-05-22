@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './users.entity';
 import * as bcrypt from 'bcrypt';
+import { CreateUserdto } from './users.dto';
 
 @Injectable()
 export class UsersService {
@@ -11,11 +12,25 @@ export class UsersService {
     private readonly usersRepository: Repository<User>,
   ) {}
 
-  public async create(createUserDto: any) {
+  public async create(createUserDto: CreateUserdto) {
     const user = new User();
     user.username = createUserDto.username;
     user.email = createUserDto.email;
     user.password = bcrypt.hashSync(`${createUserDto.password}`, 10);
+
+    const rs = await this.usersRepository.save(user);
+    return rs;
+  }
+
+  public async verifyAccount(id: string) {
+    const user = await this.usersRepository.findOne(id);
+    if (!user) {
+      throw new HttpException(
+        'Invalid verify your account',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    user.tokenVerify = null;
 
     const rs = await this.usersRepository.save(user);
     return rs;
@@ -62,32 +77,21 @@ export class UsersService {
     return rs;
   }
 
-  public async verifyAccount(id: any) {
-    const user = await this.usersRepository.findOne(id);
-    user.tokenVerify = null;
-
-    const rs = await this.usersRepository.save(user);
-    return rs;
-  }
-
   public async changePasswordService(filter: any) {
     const { id, newPassword, index } = filter;
     const password = bcrypt.hashSync(newPassword, 10);
-    console.log('info:', filter);
 
     const user = await this.usersRepository.findOne(id);
-    console.log(user);
 
     user.index = index;
     user.password = password;
 
     const rs = await this.usersRepository.save(user);
-    console.log('update', rs);
-
     return rs;
   }
 
   public async remove(id: any) {
-    await this.usersRepository.delete(id);
+    const rs = await this.usersRepository.delete(id);
+    return rs;
   }
 }

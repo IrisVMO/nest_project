@@ -7,7 +7,12 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class Signupdto {
+export enum Status {
+  Active = 'Active',
+  Busy = 'Busy',
+}
+
+export class CreateUserdto {
   @ApiProperty({ example: 'Iris123' })
   @IsNotEmpty()
   @IsString()
@@ -25,12 +30,21 @@ export class Signupdto {
   password: string;
 }
 
+export class VerifyAccountdto {
+  @ApiProperty()
+  @IsNotEmpty()
+  tokenVerify: string;
+}
+
 export class Logindto {
   @ApiProperty({ example: 'Iris123' })
   username: string;
 
   @ApiProperty({ example: 'iris123@gmail.com' })
   email: string;
+
+  @ApiProperty()
+  env: string;
 
   @ApiProperty()
   @MinLength(6)
@@ -44,9 +58,12 @@ export class UpdateInfordto {
 
   @ApiProperty({ example: 'iris123@gmail.com' })
   email: string;
+
+  @ApiProperty({ enum: Status })
+  status: Status;
 }
 
-export class GetOneUser {
+export class GetOneUserdto {
   @ApiProperty()
   id: string;
 }

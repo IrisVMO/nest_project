@@ -4,7 +4,6 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
 import { configs } from '../../configs/config';
 import { UsersModule } from '../users/users.module';
-console.log(UsersModule);
 
 @Module({
   imports: [

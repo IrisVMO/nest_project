@@ -10,26 +10,25 @@ import {
   Param,
   Post,
   Req,
-  // UseInterceptors,
-  // UploadedFile,
   Patch,
   Inject,
 } from '@nestjs/common';
-import {
-  Signupdto,
-  Logindto,
-  UpdateInfordto,
-  ChangePassworddto,
-  GetOneUser,
-  DeleteOneUser,
-} from './users.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
-import { UsersService } from './users.service';
 import { MailService } from '../../configs/mail/mail.service';
 import { configs } from '../../configs/config';
+import { UsersService } from './users.service';
+import {
+  CreateUserdto,
+  VerifyAccountdto,
+  Logindto,
+  UpdateInfordto,
+  ChangePassworddto,
+  GetOneUserdto,
+  DeleteOneUser,
+} from './users.dto';
 
 @ApiTags('Users')
 @Controller('api/users')
@@ -42,7 +41,10 @@ export class UsersController {
   ) {}
 
   @Post('signup')
-  public async sigup(@Body() createUserDto: Signupdto, @Res() res) {
+  @ApiResponse({ status: 201, description: 'Created.' })
+  @ApiResponse({ status: 409, description: 'Confilic.' })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  public async sigup(@Body() createUserDto: CreateUserdto, @Res() res) {
     const isExistEmail = await this.usersService.findOneUser({
       email: createUserDto.email,
     });
@@ -73,33 +75,50 @@ export class UsersController {
     };
 
     await this.usersService.updateInforService({ tokenVerify, id });
-    // this.mailService.sendMail(option);
+    this.mailService.sendMail(option);
 
     res.json({ data: user });
   }
 
-  @Get('verifyAcount')
-  public async verifyAccount(@Res() res) {
-    const id = '';
-    const data = await this.usersService.verifyAccount(id);
+  @Get('verify/:tokenVerify')
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  public async verifyAccount(
+    @Param() verifyAccountdto: VerifyAccountdto,
+    @Res() res,
+  ) {
+    const { tokenVerify } = verifyAccountdto;
+    const decode = this.jwtService.verify(tokenVerify);
+    const data = await this.usersService.verifyAccount(decode.id);
     res.json(data);
   }
 
   @Post('login')
+  @ApiResponse({ status: 200, description: 'Ok.' })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
   public async Login(@Body() loginDto: Logindto, @Res() res) {
+    const { env } = loginDto;
     const user = await this.usersService.findOneUser(loginDto);
 
     if (!user) {
-      throw new HttpException('Email or username wrong', HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        'Email or username wrong',
+        HttpStatus.BAD_REQUEST,
+      );
     }
-    // if (user.tokenVerify) {
-    //   throw new HttpException('Please verify account', HttpStatus.BAD_REQUEST);
-    // }
+
+    if (env != 'test') {
+      if (user.tokenVerify) {
+        throw new HttpException(
+          'Please verify account',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
 
     const result = bcrypt.compareSync(loginDto.password, user.password);
 
     if (!result) {
-      throw new HttpException('Password wrong', HttpStatus.NOT_FOUND);
+      throw new HttpException('Password wrong', HttpStatus.BAD_REQUEST);
     }
 
     const { id, index } = user;
@@ -108,7 +127,7 @@ export class UsersController {
     res.json({ data: user, accessToken });
   }
 
-  @ApiBearerAuth('JWT-auth')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Get()
   public async findAll(@Res() res) {
@@ -116,21 +135,59 @@ export class UsersController {
     res.json(data);
   }
 
-  @ApiBearerAuth('JWT-auth')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Get(':id')
-  public async findOne(@Param('id') id: GetOneUser, @Res() res) {
-    console.log(id);
-
+  @ApiResponse({ status: 404, description: 'Not found.' })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  public async findOne(@Param('id') id: GetOneUserdto, @Res() res) {
     const user = await this.usersService.findOneUser({ id });
-    console.log('user', user);
-
+    if (!user) {
+      throw new HttpException('User is not found', HttpStatus.NOT_FOUND);
+    }
     res.json(user);
   }
 
-  @ApiBearerAuth('JWT-auth')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Patch('changePassword')
+  @ApiResponse({ status: 201, description: 'Updated.' })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  public async changePassword(
+    @Body() changePassworddto: ChangePassworddto,
+    @Res() res,
+    @Req() req,
+  ) {
+    const { currentPassword, newPassword } = changePassworddto;
+    const { id } = req.user;
+    const user = await this.usersService.findOneUser({ id });
+    const { password } = user;
+
+    const result = bcrypt.compareSync(currentPassword, password);
+
+    if (!result) {
+      throw new HttpException('Password wrong', HttpStatus.BAD_REQUEST);
+    }
+
+    const index = Math.floor(Math.random() * 10000);
+
+    const data = await this.usersService.changePasswordService({
+      newPassword,
+      id,
+      index,
+    });
+
+    res.json({ data });
+  }
+
+  @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Patch()
+  @ApiResponse({ status: 201, description: 'Updated.' })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
   public async updateInfor(
     @Body() updateUserDto: UpdateInfordto,
     @Res() res,
@@ -145,41 +202,13 @@ export class UsersController {
     res.json({ data });
   }
 
-  @ApiBearerAuth('JWT-auth')
-  @UseGuards(AuthGuard('jwt'))
-  @Patch('changePassword')
-  public async changePassword(
-    @Body() changePassworddto: ChangePassworddto,
-    @Res() res,
-    @Req() req,
-  ) {
-    const { currentPassword, newPassword } = changePassworddto;
-    const { id } = req.user;
-    const user = await this.usersService.findOneUser({ id });
-    const { password } = user;
-
-    const result = bcrypt.compareSync(currentPassword, password);
-
-    if (!result) {
-      throw new HttpException('Password wrong', HttpStatus.NOT_FOUND);
-    }
-
-    const index = Math.floor(Math.random() * 10000);
-
-    const data = await this.usersService.changePasswordService({
-      newPassword,
-      id,
-      index,
-    });
-
-    res.json({ data });
-  }
-
-  @ApiBearerAuth('JWT-auth')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
   public async remove(@Param('id') id: DeleteOneUser, @Res() res) {
     const data = await this.usersService.remove(id);
-    res.json(HttpStatus.OK, data);
+    res.json(data);
   }
 }

@@ -22,6 +22,9 @@ export class Photo {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ generated: 'uuid' })
+  userId: string;
+
   @Column({ nullable: true })
   caption: string;
 
@@ -36,10 +39,10 @@ export class Photo {
   status: Status;
 
   @CreateDateColumn({ name: 'Created_At', type: 'timestamp' })
-  createdAt: Date;
+  createdat: Date;
 
   @UpdateDateColumn({ name: 'Updated_At', type: 'timestamp' })
-  updatedAt: Date;
+  updatedat: Date;
 
   @ManyToOne(() => Album, (album) => album.photos)
   album: Album;

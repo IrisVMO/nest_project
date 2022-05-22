@@ -1,22 +1,61 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Photodto } from './photos.dto';
+import { In, Repository } from 'typeorm';
+import { UpdatePhotodto } from './photos.dto';
 import { Photo } from './photos.entity';
 
 @Injectable()
 export class PhotosService {
   constructor(
     @InjectRepository(Photo)
-    private readonly phtosRepository: Repository<Photo>,
+    private readonly photosRepository: Repository<Photo>,
   ) {}
 
-  public async createPhoto(photodto: Photodto, link: string) {
+  public async createPhoto(photodto, link: string, user: any) {
     const { caption } = photodto;
     const photo = new Photo();
     photo.caption = caption;
     photo.link = link;
-    const rs = await this.phtosRepository.save(photo);
+    photo.user = user;
+    const rs = await this.photosRepository.save(photo);
     return rs;
+  }
+
+  public async getAllPhotoInAlbum(albumId: string) {
+    const rs = await this.photosRepository.find({ where: { albumId } });
+    return rs;
+  }
+
+  public async updatePhoto(updatePhotodto: UpdatePhotodto, id: string) {
+    const { caption, status } = updatePhotodto;
+
+    const photo = await this.photosRepository.findOne(id);
+    if (!photo) {
+      throw new HttpException(
+        'Photo not found to update',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    photo.caption = caption;
+    photo.status = status;
+
+    const rs = await this.photosRepository.save(photo);
+    return rs;
+  }
+
+  public async newFeed(following: any) {
+    const rs = await this.photosRepository.find({
+      where: { userId: In(following) },
+      order: { createdat: 'DESC' },
+    });
+    return rs;
+  }
+
+  public async getOnePhoto(getOnePhotodto: any) {
+    const { id } = getOnePhotodto;
+
+    const photo = await this.photosRepository.findOne(id);
+    return photo;
   }
 }

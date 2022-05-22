@@ -3,18 +3,20 @@ import { forwardRef, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { UsersModule } from '../src/apis/users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Signupdto } from '../src/apis/users/users.dto';
+import { CreateUserdto } from '../src/apis/users/users.dto';
 import { AuthModule } from '../src/apis/auth/auth.module';
 import { AlbumsModule } from '../src/apis/albums/albums.module';
 import { CommentsModule } from '../src/apis/comments/comments.module';
 import { FollowsModule } from '../src/apis/follows/follows.module';
 import { LikesModule } from '../src/apis/likes/likes.module';
 import { PhotosModule } from '../src/apis/photos/photos.module';
+import { configs } from '../src/configs/config';
 
 describe('Users - /users (e2e)', () => {
   const user = {
     username: 'nsa2me',
     email: 'naes2m@gmail.com',
+    env: 'test',
     password: '123456',
   };
 
@@ -23,17 +25,7 @@ describe('Users - /users (e2e)', () => {
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
-        TypeOrmModule.forRoot({
-          type: 'postgres',
-          synchronize: true,
-          logging: false,
-          host: 'localhost',
-          port: 5432,
-          username: 'postgres',
-          password: 'postgres',
-          database: 'album_nest',
-          autoLoadEntities: true,
-        }),
+        TypeOrmModule.forRoot(configs.dbtest),
         forwardRef(() => AuthModule),
         forwardRef(() => UsersModule),
         UsersModule,
@@ -52,33 +44,35 @@ describe('Users - /users (e2e)', () => {
   it('Create [POST /api/users/signup]', () => {
     return request(app.getHttpServer())
       .post('/api/users/signup')
-      .send(user as Signupdto)
+      .send(user as CreateUserdto)
       .expect(201);
   });
 
-  // it('Get all users [GET /users]', () => {
+  // it('Create [POST /api/users/signup] conflic', () => {
   //   return request(app.getHttpServer())
-  //     .get('/users')
-  //     .expect(200)
-  //     .then(({ body }) => {
-  //       expect(body).toBeDefined();
-  //     });
+  //     .post('/api/users/signup')
+  //     .send(user as CreateUserdto)
+  //     .expect(409);
   // });
 
-  // it('Get one user [GET /users/:id]', () => {
+  // it('Create [POST /api/users/signup] bad request', () => {
   //   return request(app.getHttpServer())
-  //     .get('/users/2')
-  //     .expect(200)
-  //     .then(({ body }) => {
-  //       expect(body).toBeDefined();
-  //     });
+  //     .post('/api/users/signup')
+  //     .send(user as CreateUserdto)
+  //     .expect(400);
   // });
 
-  // it('Delete one user [DELETE /users/:id]', () => {
-  //   return request(app.getHttpServer()).delete('/users/1').expect(200);
+  // it('Create [POST /api/users/login]', () => {
+  //   return request(app.getHttpServer())
+  //     .post('/api/users/login')
+  //     .send(user as CreateUserdto)
+  //     .expect(200);
   // });
 
-  // afterAll(async () => {
-  //   await app.close();
+  // it('Create [POST /api/users/login]', () => {
+  //   return request(app.getHttpServer())
+  //     .post('/api/users/login')
+  //     .send(user as CreateUserdto)
+  //     .expect(400);
   // });
 });

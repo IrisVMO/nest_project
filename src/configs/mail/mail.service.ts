@@ -6,7 +6,6 @@ export class MailService {
   constructor(private mailerService: MailerService) {}
 
   public sendMail(option) {
-    console.log(option);
     this.mailerService
       .sendMail(option)
       .then()
