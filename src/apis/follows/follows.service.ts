@@ -13,33 +13,50 @@ export class FollowsService {
     private readonly photosService: PhotosService,
   ) {}
 
-  public async follow(followdto: Followdto, user: any) {
-    // let follow: any;
+  public async createFollow(user: any) {
+    const follow = new Follow();
+    follow.user = user;
+
+    const rs = await this.followsRepository.save(follow);
+
+    return rs;
+  }
+
+  public async follow(followdto: Followdto, userId: string) {
     const { userIdFollowing } = followdto;
-    const { id: userId } = user;
 
-    let follow = await this.followsRepository.findOne({ where: { userId } });
+    const [follower, following] = await Promise.all([
+      this.followsRepository.findOne({ where: { userId } }),
+      this.followsRepository.findOne({ where: { userId: userIdFollowing } }),
+    ]);
 
-    if (!follow) {
-      follow = new Follow();
-      follow.user = user;
-      follow.userIdFollowing = [];
-      follow.userIdFollowing.push(userIdFollowing);
-    }
+    follower.userIdFollowing.push(userIdFollowing);
+    following.userIdFollower.push(userId);
 
-    if (follow) {
-      const following = follow.userIdFollowing;
-      const wasFollow = following.includes(userIdFollowing);
-      if (wasFollow) {
-        throw new HttpException('Followed this person', HttpStatus.CONFLICT);
-      } else {
-        follow.userIdFollowing.push(userIdFollowing);
-      }
-    }
+    // if (!follow) {
+    //   follow = new Follow();
+    //   follow.user = user;
+    //   follow.userIdFollowing = [];
+    //   follow.userIdFollowing.push(userIdFollowing);
+    // }
+
+    // if (follow) {
+    //   const following = follow.userIdFollowing;
+    //   const wasFollow = following.includes(userIdFollowing);
+    //   if (wasFollow) {
+    //     throw new HttpException('Followed this person', HttpStatus.CONFLICT);
+    //   } else {
+    //     follow.userIdFollowing.push(userIdFollowing);
+    //   }
+    // }
     // follow.userIdFollowing = follow.userIdFollowing.push(userIdFollowing);
     // follow.userIdFollowing = follow.userIdFollowing.concat(userIdFollowing);
 
-    const rs = await this.followsRepository.save(follow);
+    const rs = await Promise.all([
+      this.followsRepository.save(follower),
+      this.followsRepository.save(following),
+    ]);
+
     return rs;
   }
 

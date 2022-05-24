@@ -1,10 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { In, Like, Repository } from 'typeorm';
 import {
   CreatePhotodto,
   DeleteOnePhotodto,
   GetOnePhotodto,
+  SearchPhotodto,
   UpdatePhotodto,
 } from './photos.dto';
 import { Photo } from './photos.entity';
@@ -61,6 +62,17 @@ export class PhotosService {
     const { id } = getOnePhotodto;
 
     const rs = await this.photosRepository.findOne(id);
+    return rs;
+  }
+
+  public async searchByPhotoCaption(searchPhotodto: SearchPhotodto) {
+    const { caption } = searchPhotodto;
+
+    const rs = await this.photosRepository.find({
+      where: {
+        caption: Like(`%${caption}%`),
+      },
+    });
     return rs;
   }
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Album } from './albums.entity';
 import {
@@ -7,6 +7,7 @@ import {
   DeleteAlbumdto,
   GetAllPhotoInAlbumdto,
   GetOneAlbumdto,
+  SearchAlbumdto,
   ParamUpdateAlbumdto,
   UpdateAlbumdto,
 } from './albums.dto';
@@ -32,6 +33,15 @@ export class AlbumsService {
   public async findOneAlbumService(getOneAlbumdto: GetOneAlbumdto) {
     const { id } = getOneAlbumdto;
     const rs = await this.albumsRepository.findOne({ where: { id } });
+    return rs;
+  }
+
+  public async searchByAlbumName(searchAlbumdto: SearchAlbumdto) {
+    const { name } = searchAlbumdto;
+    const rs = await this.albumsRepository.find({
+      name: Like(`%${name}%`),
+    });
+
     return rs;
   }
 

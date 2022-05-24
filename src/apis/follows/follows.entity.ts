@@ -23,6 +23,12 @@ export class Follow {
   })
   public userIdFollowing: string[];
 
+  @Column('text', {
+    array: true,
+    default: [],
+  })
+  public userIdFollower: string[];
+
   @OneToOne(() => User, (user) => user.follows)
   @JoinColumn()
   user: User;

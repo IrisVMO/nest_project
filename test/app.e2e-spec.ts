@@ -10,7 +10,6 @@ import {
 import { AppModule } from '../src/app.module';
 import { data_test } from './test.data';
 import { CreateAlbumDto, UpdateAlbumdto } from '../src/apis/albums/albums.dto';
-// import { UpdatePhotodto } from '../src/apis/photos/photos.dto';
 
 let app: INestApplication;
 let accessToken: string, photo: any, album: any, user: any;
@@ -41,7 +40,7 @@ describe('E2e test feature Users', () => {
       .expect(409);
   });
 
-  it('Create [POST /api/users/signup] Bad Request', () => {
+  it('Create [POST /api/users/signup] 400 Bad Request', () => {
     request(app.getHttpServer())
       .post('/api/users/signup')
       .send(data_test.user as CreateUserdto)
@@ -59,7 +58,7 @@ describe('E2e test feature Users', () => {
     accessToken = response.body.accessToken;
   });
 
-  it('Create [POST /api/users/login] Bad Request', () => {
+  it('Create [POST /api/users/login] 400 Bad Request', () => {
     request(app.getHttpServer())
       .post('/api/users/login')
       .send(null)
@@ -73,7 +72,7 @@ describe('E2e test feature Users', () => {
       .set({ Authorization: `Bearer ${accessToken}` })
       .expect(201);
   });
-  it('Create [GET /api/users/all] Unauthorization', () => {
+  it('Create [GET /api/users/all] 401 Unauthorization', () => {
     request(app.getHttpServer())
       .get('/api/users/all')
       .set({ Authorization: 'Bearer' })
@@ -89,7 +88,7 @@ describe('E2e test feature Users', () => {
       .expect(200);
   });
 
-  it('Create [PATCH /api/users/:id] Bad Request', () => {
+  it('Create [PATCH /api/users/:id] 400 Bad Request', () => {
     request(app.getHttpServer())
       .patch(`/api/users/${user.id}`)
       .set({ Authorization: `Bearer ${accessToken}` })
@@ -113,14 +112,14 @@ describe('E2e test feature Users', () => {
       .expect(200);
   });
 
-  it('Create [GET /api/users/one/:id] Bad Request', () => {
+  it('Create [GET /api/users/one/:id] 400 Bad Request', () => {
     request(app.getHttpServer())
       .get(`/api/users/one/${'id'}`)
       .set({ Authorization: `Bearer ${accessToken}` })
       .expect(400);
   });
 
-  it('Create [GET /api/users/one/:id] Unauthorization', () => {
+  it('Create [GET /api/users/one/:id] 401 Unauthorization', () => {
     request(app.getHttpServer())
       .get(`/api/users/one/${user.id}`)
       .set({ Authorization: 'Bearer' })
@@ -134,6 +133,21 @@ describe('E2e test feature Users', () => {
       .expect(404);
   });
 
+  // Search user by name
+  it('Create [GET /api/users/search/:username]', () => {
+    request(app.getHttpServer())
+      .get(`/api/users/search/nam`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .expect(200);
+  });
+
+  it('Create [GET /api/users/search/:username] 401 Unauthorization', () => {
+    request(app.getHttpServer())
+      .get(`/api/users/search/nam`)
+      .set({ Authorization: `Bearer` })
+      .expect(401);
+  });
+
   // Change Password
   it('Create [PATCH /api/users/changePassword]', () => {
     request(app.getHttpServer())
@@ -143,7 +157,7 @@ describe('E2e test feature Users', () => {
       .expect(200);
   });
 
-  it('Create [PATCH /api/users/changePassword] Bad Request', () => {
+  it('Create [PATCH /api/users/changePassword] 400 Bad Request', () => {
     request(app.getHttpServer())
       .patch('/api/users/changePassword')
       .set({ Authorization: `Bearer ${accessToken}` })
@@ -151,7 +165,7 @@ describe('E2e test feature Users', () => {
       .expect(400);
   });
 
-  it('Create [PATCH /api/users/changePassword] Unauthorization', () => {
+  it('Create [PATCH /api/users/changePassword] 401 Unauthorization', () => {
     request(app.getHttpServer())
       .patch('/api/users/changePassword')
       .set({ Authorization: 'Bearer' })
@@ -174,7 +188,7 @@ describe('E2e test feature Albums', () => {
     album = response.body.data;
   });
 
-  it('Create [POST /api/albums] Bad Request', () => {
+  it('Create [POST /api/albums] 400 Bad Request', () => {
     request(app.getHttpServer())
       .post('/api/albums')
       .set({ Authorization: `Bearer ${accessToken}` })
@@ -182,7 +196,7 @@ describe('E2e test feature Albums', () => {
       .expect(400);
   });
 
-  it('Create [POST /api/albums] Unauthorization', () => {
+  it('Create [POST /api/albums] 401 Unauthorization', () => {
     request(app.getHttpServer())
       .post('/api/albums')
       .set({ Authorization: 'Bearer' })
@@ -198,17 +212,32 @@ describe('E2e test feature Albums', () => {
       .expect(200);
   });
 
-  it('Create [GET /api/albums/:id] Bad Request', () => {
+  it('Create [GET /api/albums/:id] 400 Bad Request', () => {
     request(app.getHttpServer())
       .get(`/api/albums/${null}`)
       .set({ Authorization: `Bearer ${accessToken}` })
       .expect(400);
   });
 
-  it('Create [GET /api/albums/:id] Unauthorization', () => {
+  it('Create [GET /api/albums/:id] 401 Unauthorization', () => {
     request(app.getHttpServer())
       .get(`/api/albums/${album.id}`)
       .set({ Authorization: 'Bearer' })
+      .expect(401);
+  });
+
+  // Search album by name
+  it('Create [GET /api/albums/search/:name]', () => {
+    request(app.getHttpServer())
+      .get(`/api/albums/search/ha`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .expect(200);
+  });
+
+  it('Create [GET /api/albums/search/:name] 401 Unauthorization', () => {
+    request(app.getHttpServer())
+      .get(`/api/albums/search/ha`)
+      .set({ Authorization: `Bearer` })
       .expect(401);
   });
 
@@ -221,7 +250,7 @@ describe('E2e test feature Albums', () => {
       .expect(200);
   });
 
-  it('Create [PATCH /api/albums/:id] Bad Request', () => {
+  it('Create [PATCH /api/albums/:id] 400 Bad Request', () => {
     request(app.getHttpServer())
       .patch(`/api/albums/${null}`)
       .set({ Authorization: `Bearer ${accessToken}` })
@@ -229,7 +258,7 @@ describe('E2e test feature Albums', () => {
       .expect(400);
   });
 
-  it('Create [PATCH /api/albums/:id] Unauthorization', () => {
+  it('Create [PATCH /api/albums/:id] 401 Unauthorization', () => {
     request(app.getHttpServer())
       .patch(`/api/albums/${album.id}`)
       .set({ Authorization: 'Bearer' })
@@ -245,14 +274,14 @@ describe('E2e test feature Albums', () => {
       .expect(201);
   });
 
-  it('Create [DELETE /api/albums/:id] Bad Request', () => {
+  it('Create [DELETE /api/albums/:id] 400 Bad Request', () => {
     request(app.getHttpServer())
       .delete(`/api/albums/${'id'}`)
       .set({ Authorization: `Bearer ${accessToken}` })
       .expect(400);
   });
 
-  it('Create [DELETE /api/albums/:id] Unauthorization', () => {
+  it('Create [DELETE /api/albums/:id] 401 Unauthorization', () => {
     request(app.getHttpServer())
       .delete(`/api/albums/${album.id}`)
       .set({ Authorization: 'Bearer' })
@@ -267,14 +296,14 @@ describe('E2e test feature Albums', () => {
       .expect(201);
   });
 
-  it('Create [GET /api/albums/allPhotoInAlbum/:id] Bad Request', () => {
+  it('Create [GET /api/albums/allPhotoInAlbum/:id] 400 Bad Request', () => {
     request(app.getHttpServer())
       .get(`/api/albums/allPhotoInAlbum/${'album.id'}`)
       .set({ Authorization: `Bearer ${accessToken}` })
       .expect(400);
   });
 
-  it('Create [GET /api/albums/allPhotoInAlbum/:id] Unauthorization', () => {
+  it('Create [GET /api/albums/allPhotoInAlbum/:id] 401 Unauthorization', () => {
     request(app.getHttpServer())
       .get(`/api/albums/allPhotoInAlbum/${album.id}`)
       .set({ Authorization: 'Bearer' })
@@ -298,12 +327,27 @@ describe('E2e test feature Photos', () => {
     console.log('photo:', photo);
   });
 
-  it('Create [POST /api/photos] Unauthorization', () => {
+  it('Create [POST /api/photos] 401 Unauthorization', () => {
     request(app.getHttpServer())
       .post('/api/photos')
       .set({ Authorization: 'Bearer' })
       .attach('image', 'image_test/img2-f2ee.jpg')
       .field('caption', data_test.photo.caption)
+      .expect(401);
+  });
+
+  // Search photo by caption
+  it('Create [GET /api/photos/search/:caption]', () => {
+    request(app.getHttpServer())
+      .get(`/api/photos/search/ha`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .expect(200);
+  });
+
+  it('Create [GET /api/photos/search/:caption] 401 Unauthorization', () => {
+    request(app.getHttpServer())
+      .get(`/api/photos/search/ha`)
+      .set({ Authorization: `Bearer` })
       .expect(401);
   });
 
@@ -316,7 +360,7 @@ describe('E2e test feature Photos', () => {
       .expect(200);
   });
 
-  it('Create [PATCH /api/photos/:id] Bad Request', () => {
+  it('Create [PATCH /api/photos/:id] 400 Bad Request', () => {
     request(app.getHttpServer())
       .patch(`/api/photos/${null}`)
       .set({ Authorization: `Bearer ${accessToken}` })
@@ -324,7 +368,7 @@ describe('E2e test feature Photos', () => {
       .expect(400);
   });
 
-  it('Create [PATCH /api/photos/:id] Unauthorization', () => {
+  it('Create [PATCH /api/photos/:id] 401 Unauthorization', () => {
     request(app.getHttpServer())
       .patch(`/api/photos/${photo.id}`)
       .set({ Authorization: 'Bearer' })
@@ -340,14 +384,14 @@ describe('E2e test feature Photos', () => {
       .expect(201);
   });
 
-  it('Create [DELETE /api/photos/:id] Bad Request', () => {
+  it('Create [DELETE /api/photos/:id] 400 Bad Request', () => {
     request(app.getHttpServer())
       .delete(`/api/photos/${'id'}`)
       .set({ Authorization: `Bearer ${accessToken}` })
       .expect(400);
   });
 
-  it('Create [DELETE /api/photos/:id] Unauthorization', () => {
+  it('Create [DELETE /api/photos/:id] 401 Unauthorization', () => {
     request(app.getHttpServer())
       .delete(`/api/photos/${photo.id}`)
       .set({ Authorization: 'Bearer' })
@@ -368,7 +412,7 @@ describe('E2e test feature Likes', () => {
       .expect(201);
   });
 
-  it('Create [POST /api/likes] Bad Request', () => {
+  it('Create [POST /api/likes] 400 Bad Request', () => {
     request(app.getHttpServer())
       .post('/api/likes')
       .set({ Authorization: `Bearer ${accessToken}` })
@@ -376,7 +420,7 @@ describe('E2e test feature Likes', () => {
       .expect(400);
   });
 
-  it('Create [POST /api/likes] Unauthorization', () => {
+  it('Create [POST /api/likes] 401 Unauthorization', () => {
     request(app.getHttpServer())
       .post('/api/likes')
       .set({ Authorization: 'Bearer' })
@@ -393,7 +437,7 @@ describe('E2e test feature Likes', () => {
       .expect(201);
   });
 
-  it('Create [DELETE /api/likes/:id] Bad Request', () => {
+  it('Create [DELETE /api/likes/:id] 400 Bad Request', () => {
     request(app.getHttpServer())
       .delete('/api/likes')
       .set({ Authorization: `Bearer ${accessToken}` })
@@ -401,7 +445,7 @@ describe('E2e test feature Likes', () => {
       .expect(400);
   });
 
-  it('Create [DELETE /api/likes/:id] Unauthorization', () => {
+  it('Create [DELETE /api/likes/:id] 401 Unauthorization', () => {
     request(app.getHttpServer())
       .delete('/api/likes')
       .set({ Authorization: 'Bearer' })
@@ -417,14 +461,14 @@ describe('E2e test feature Likes', () => {
       .expect(201);
   });
 
-  it('Create [GET /api/likes/allLikeInPhoto/:id] Bad Request', () => {
+  it('Create [GET /api/likes/allLikeInPhoto/:id] 400 Bad Request', () => {
     request(app.getHttpServer())
       .get(`/api/likes/allLikeInPhoto/${'album.id'}`)
       .set({ Authorization: `Bearer ${accessToken}` })
       .expect(400);
   });
 
-  it('Create [GET /api/likes/allLikeInPhoto/:id] Unauthorization', () => {
+  it('Create [GET /api/likes/allLikeInPhoto/:id] 401 Unauthorization', () => {
     request(app.getHttpServer())
       .get(`/api/likes/allLikeInPhoto/${photo.id}`)
       .set({ Authorization: 'Bearer' })
@@ -444,7 +488,7 @@ describe('E2e test feature Comments', () => {
       .expect(201);
   });
 
-  it('Create [POST /api/comments] Bad Request', () => {
+  it('Create [POST /api/comments] 400 Bad Request', () => {
     request(app.getHttpServer())
       .post('/api/comments')
       .set({ Authorization: `Bearer ${accessToken}` })
@@ -452,7 +496,7 @@ describe('E2e test feature Comments', () => {
       .expect(400);
   });
 
-  it('Create [POST /api/comments] Unauthorization', () => {
+  it('Create [POST /api/comments] 401 Unauthorization', () => {
     request(app.getHttpServer())
       .post('/api/comments')
       .set({ Authorization: 'Bearer' })
@@ -472,7 +516,7 @@ describe('E2e test feature Comments', () => {
       .expect(200);
   });
 
-  it('Create [PATCH /api/comments] Bad Request', () => {
+  it('Create [PATCH /api/comments] 400 Bad Request', () => {
     request(app.getHttpServer())
       .patch(`/api/comments`)
       .set({ Authorization: `Bearer ${accessToken}` })
@@ -480,7 +524,7 @@ describe('E2e test feature Comments', () => {
       .expect(400);
   });
 
-  it('Create [PATCH /api/comments] Unauthorization', () => {
+  it('Create [PATCH /api/comments] 401 Unauthorization', () => {
     request(app.getHttpServer())
       .patch(`/api/comments`)
       .set({ Authorization: 'Bearer' })
@@ -499,14 +543,14 @@ describe('E2e test feature Comments', () => {
       .expect(201);
   });
 
-  it('Create [GET /api/comments/allCommentInPhoto/:photoId] Bad Request', () => {
+  it('Create [GET /api/comments/allCommentInPhoto/:photoId] 400 Bad Request', () => {
     request(app.getHttpServer())
       .get(`/api/comments/allCommentInPhoto/${'photo.id'}`)
       .set({ Authorization: `Bearer ${accessToken}` })
       .expect(400);
   });
 
-  it('Create [GET /api/comments/allCommentInPhoto/:photoId] Unauthorization', () => {
+  it('Create [GET /api/comments/allCommentInPhoto/:photoId] 401 Unauthorization', () => {
     request(app.getHttpServer())
       .get(`/api/comments/allCommentInPhoto/${photo.id}`)
       .set({ Authorization: 'Bearer' })
@@ -522,7 +566,7 @@ describe('E2e test feature Comments', () => {
       .expect(201);
   });
 
-  it('Create [DELETE /api/comments] Bad Request', () => {
+  it('Create [DELETE /api/comments] 400 Bad Request', () => {
     request(app.getHttpServer())
       .delete(`/api/comments`)
       .set({ Authorization: `Bearer ${accessToken}` })
@@ -530,7 +574,7 @@ describe('E2e test feature Comments', () => {
       .expect(400);
   });
 
-  it('Create [DELETE /api/comments] Unauthorization', () => {
+  it('Create [DELETE /api/comments] 401 Unauthorization', () => {
     request(app.getHttpServer())
       .delete(`/api/comments`)
       .set({ Authorization: 'Bearer' })
@@ -551,7 +595,7 @@ describe('E2e test feature Follows', () => {
       .expect(201);
   });
 
-  it('Create [POST /api/follows] Bad Request', () => {
+  it('Create [POST /api/follows] 400 Bad Request', () => {
     request(app.getHttpServer())
       .post('/api/follows')
       .set({ Authorization: `Bearer ${accessToken}` })
@@ -559,7 +603,7 @@ describe('E2e test feature Follows', () => {
       .expect(400);
   });
 
-  it('Create [POST /api/follows] Unauthorization', () => {
+  it('Create [POST /api/follows] 401 Unauthorization', () => {
     request(app.getHttpServer())
       .post('/api/follows')
       .set({ Authorization: 'Bearer' })
@@ -575,7 +619,7 @@ describe('E2e test feature Follows', () => {
       .expect(201);
   });
 
-  it('Create [GET /api/follows/newFeed] Unauthorization', () => {
+  it('Create [GET /api/follows/newFeed] 401 Unauthorization', () => {
     request(app.getHttpServer())
       .post(`/api/follows/newFeed`)
       .set({ Authorization: 'Bearer' })
@@ -590,7 +634,7 @@ describe('E2e test feature Follows', () => {
       .expect(200);
   });
 
-  it('Create [DELETE /api/follows/:id] Bad Request', () => {
+  it('Create [DELETE /api/follows/:id] 400 Bad Request', () => {
     request(app.getHttpServer())
       .delete(`/api/follows/${'id'}`)
       .set({ Authorization: `Bearer ${accessToken}` })
@@ -598,39 +642,41 @@ describe('E2e test feature Follows', () => {
       .expect(400);
   });
 
-  it('Create [DELETE /api/follows/:id] Unauthorization', () => {
+  it('Create [DELETE /api/follows/:id] 401 Unauthorization', () => {
     request(app.getHttpServer())
       .delete(`/api/follows/${album.id}`)
       .set({ Authorization: 'Bearer' })
       .send({ userIdFollowing: data_test.follows.userIdFollowing })
       .expect(401);
   });
-});
-
-//=========================================================================
-// Feature Users
-describe('E2e test feature Users', () => {
-  // Delete User
-  it('Create [Delete /api/users/:id]', () => {
-    request(app.getHttpServer())
-      .delete(`/api/users/${user.id}`)
-      .set({ Authorization: `Bearer ${accessToken}` })
-      .expect(200);
-  });
-
-  it('Create [Delete /api/users/login] Bad request', () => {
-    request(app.getHttpServer())
-      .delete('/api/users')
-      .set({ Authorization: `Bearer ${accessToken}` })
-      .expect(400);
-  });
-
-  it('Create [Delete /api/users/login] Unauthorization', () => {
-    request(app.getHttpServer())
-      .delete(`/api/users/${user.id}`)
-      .set({ Authorization: 'Bearer' })
-      .expect(401);
-  });
 
   afterAll(() => app.close());
 });
+
+// //=========================================================================
+// // Feature Users
+// describe('E2e test feature Users', () => {
+//   // Delete User
+//   it('Create [Delete /api/users/:id]', () => {
+//     request(app.getHttpServer())
+//       .delete(`/api/users/${user.id}`)
+//       .set({ Authorization: `Bearer ${accessToken}` })
+//       .expect(200);
+//   });
+
+//   it('Create [Delete /api/users/login] 400 Bad request', () => {
+//     request(app.getHttpServer())
+//       .delete('/api/users')
+//       .set({ Authorization: `Bearer ${accessToken}` })
+//       .expect(400);
+//   });
+
+//   it('Create [Delete /api/users/login] 401 Unauthorization', () => {
+//     request(app.getHttpServer())
+//       .delete(`/api/users/${user.id}`)
+//       .set({ Authorization: 'Bearer' })
+//       .expect(401);
+//   });
+
+//   afterAll(() => app.close());
+// });

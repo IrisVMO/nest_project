@@ -27,6 +27,7 @@ import {
   UpdateInfordto,
   ChangePassworddto,
   GetOneUserdto,
+  SearchUserdto,
   DeleteOneUser,
 } from './users.dto';
 
@@ -150,6 +151,17 @@ export class UsersController {
     if (!data) {
       throw new HttpException('User is not found', HttpStatus.NOT_FOUND);
     }
+
+    res.json({ data });
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Get('search/:username')
+  @ApiResponse({ status: 200, description: 'Ok' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  public async searchUser(@Param() searchUserdto: SearchUserdto, @Res() res) {
+    const data = await this.usersService.searchByUserName(searchUserdto);
 
     res.json({ data });
   }

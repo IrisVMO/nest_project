@@ -18,6 +18,11 @@ export class GetOnePhotodto {
   id: string;
 }
 
+export class SearchPhotodto {
+  @ApiProperty()
+  caption: string;
+}
+
 export class DeleteOnePhotodto {
   @ApiProperty()
   @IsNotEmpty()

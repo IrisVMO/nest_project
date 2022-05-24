@@ -33,6 +33,11 @@ export class GetAllPhotoInAlbumdto {
   id: string;
 }
 
+export class SearchAlbumdto {
+  @ApiProperty({ example: 'Seas' })
+  name: string;
+}
+
 export class UpdateAlbumdto {
   @ApiProperty()
   @IsNotEmpty()

@@ -64,6 +64,11 @@ export class UpdateInfordto {
   status: Status;
 }
 
+export class SearchUserdto {
+  @ApiProperty({ nullable: true })
+  username: string;
+}
+
 export class GetOneUserdto {
   @ApiProperty({ nullable: true })
   @IsUUID()

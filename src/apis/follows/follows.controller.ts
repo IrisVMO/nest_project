@@ -25,7 +25,8 @@ export class FollowsController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async follow(@Body() followdto: Followdto, @Res() res, @Req() req) {
-    const data = await this.followsService.follow(followdto, req.user);
+    const { id: userId } = req.user;
+    const data = await this.followsService.follow(followdto, userId);
 
     res.json({ data });
   }

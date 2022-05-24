@@ -11,8 +11,11 @@ import { FollowsModule } from './apis/follows/follows.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, envFilePath: ['.env'] }),
-    TypeOrmModule.forRoot(configs.dbDev),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ['.env', '.env_test'],
+    }),
+    TypeOrmModule.forRoot(configs.db),
     UsersModule,
     AlbumsModule,
     PhotosModule,

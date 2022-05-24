@@ -21,6 +21,7 @@ import {
   UpdateAlbumdto,
   DeleteAlbumdto,
   ParamUpdateAlbumdto,
+  SearchAlbumdto,
 } from './albums.dto';
 import { MailService } from '../../configs/mail/mail.service';
 
@@ -63,6 +64,20 @@ export class AlbumsController {
     @Param() getOneAlbumdto: GetOneAlbumdto,
   ) {
     const data = await this.albumsService.findOneAlbumService(getOneAlbumdto);
+    res.json({ data });
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Get('search/:name')
+  @ApiResponse({ status: 200, description: 'Ok' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  public async searchPhoto(
+    @Param() searchPhotodto: SearchAlbumdto,
+    @Res() res,
+  ) {
+    const data = await this.albumsService.searchByAlbumName(searchPhotodto);
+
     res.json({ data });
   }
 

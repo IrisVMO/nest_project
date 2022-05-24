@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { User } from './users.entity';
 import * as bcrypt from 'bcrypt';
-import { CreateUserdto, DeleteOneUser } from './users.dto';
+import { CreateUserdto, DeleteOneUser, SearchUserdto } from './users.dto';
 
 @Injectable()
 export class UsersService {
@@ -58,6 +58,15 @@ export class UsersService {
     const { id, index } = filter;
 
     const rs = await this.usersRepository.findOne({ where: { id, index } });
+    return rs;
+  }
+
+  public async searchByUserName(searchUserdto: SearchUserdto) {
+    const { username } = searchUserdto;
+    const rs = await this.usersRepository.find({
+      username: Like(`%${username}%`),
+    });
+
     return rs;
   }
 

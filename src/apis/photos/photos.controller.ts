@@ -28,6 +28,7 @@ import { PhotosService } from './photos.service';
 import {
   CreatePhotodto,
   GetOnePhotodto,
+  SearchPhotodto,
   UpdatePhotodto,
   DeleteOnePhotodto,
 } from './photos.dto';
@@ -107,6 +108,20 @@ export class PhotosController {
     @Res() res,
   ) {
     const data = await this.photosService.getOnePhoto(getOnePhotodto);
+    res.json({ data });
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Get('search/:caption')
+  @ApiResponse({ status: 200, description: 'Ok' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  public async searchPhoto(
+    @Param() searchPhotodto: SearchPhotodto,
+    @Res() res,
+  ) {
+    const data = await this.photosService.searchByPhotoCaption(searchPhotodto);
+
     res.json({ data });
   }
 
