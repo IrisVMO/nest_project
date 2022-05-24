@@ -2,7 +2,7 @@
 ## Description
 
 Application social network
-**Dev by Iris ^.^** 
+**Develop by Iris** 
 
 ## Installation
 
