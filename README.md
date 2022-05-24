@@ -1,7 +1,8 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Application social network
+**Dev by Iris ^.^** 
 
 ## Installation
 
@@ -39,6 +40,13 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-## Api docs
+## Api docs  
+  
+Example: 
+    host of application = 127.0.0.1
+    port of application = 6969
 
-[Nest](http://your_host:your_port/api)
+```bash
+$ Swagger open docs api
+# http://127.0.0.1/6969/api
+```
