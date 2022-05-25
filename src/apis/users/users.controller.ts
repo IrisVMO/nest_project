@@ -12,6 +12,7 @@ import {
   Req,
   Patch,
   Inject,
+  Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
@@ -27,8 +28,9 @@ import {
   UpdateInfordto,
   ChangePassworddto,
   GetOneUserdto,
-  SearchUserdto,
+  // SearchUserdto,
   DeleteOneUser,
+  GetAllUserdto,
 } from './users.dto';
 
 @ApiTags('Users')
@@ -64,8 +66,8 @@ export class UsersController {
 
     const user = await this.usersService.create(createUserDto);
     const { id } = user;
-    const { env } = createUserDto;
-    if (env != 'test') {
+    // const { env } = createUserDto;
+    if (process.env.NODE_ENV != 'test') {
       const tokenVerify = this.jwtService.sign({ id });
       const option = {
         from: configs.emailHelper,
@@ -85,7 +87,6 @@ export class UsersController {
   }
 
   @Get('verify/:tokenVerify')
-  @ApiResponse({ status: 400, description: 'Bad request' })
   public async verifyAccount(
     @Param() verifyAccountdto: VerifyAccountdto,
     @Res() res,
@@ -109,12 +110,12 @@ export class UsersController {
       );
     }
 
-    if (user.tokenVerify) {
-      throw new HttpException(
-        'Please verify account in your email address',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    // if (user.tokenVerify) {
+    //   throw new HttpException(
+    //     'Please verify account in your email address',
+    //     HttpStatus.BAD_REQUEST,
+    //   );
+    // }
 
     const result = bcrypt.compareSync(loginDto.password, user.password);
 
@@ -130,11 +131,11 @@ export class UsersController {
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Get('/all')
+  @Get()
   @ApiResponse({ status: 200, description: 'Ok' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  public async findAll(@Res() res) {
-    const data = await this.usersService.findAllUser();
+  public async findAll(@Query() getAllUserdto: GetAllUserdto, @Res() res) {
+    const data = await this.usersService.findAllUser(getAllUserdto);
     res.json({ data });
   }
 
@@ -151,17 +152,6 @@ export class UsersController {
     if (!data) {
       throw new HttpException('User is not found', HttpStatus.NOT_FOUND);
     }
-
-    res.json({ data });
-  }
-
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
-  @Get('search/:username')
-  @ApiResponse({ status: 200, description: 'Ok' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  public async searchUser(@Param() searchUserdto: SearchUserdto, @Res() res) {
-    const data = await this.usersService.searchByUserName(searchUserdto);
 
     res.json({ data });
   }
@@ -226,6 +216,8 @@ export class UsersController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async remove(@Param() deleteOneUser: DeleteOneUser, @Res() res) {
+    console.log('deleteOneUser:', deleteOneUser);
+
     const data = await this.usersService.remove(deleteOneUser);
     res.json({ data });
   }

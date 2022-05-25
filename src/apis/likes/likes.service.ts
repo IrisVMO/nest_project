@@ -17,45 +17,57 @@ export class LikesService {
     const { photoId: id } = likedto;
     const { id: userId } = user;
     let like: Like;
+    try {
+      const photo = await this.photosService.getOnePhoto({ id });
+      if (!photo) {
+        throw new HttpException(
+          "Can't to like the photo",
+          HttpStatus.BAD_REQUEST,
+        );
+      }
 
-    const photo = await this.photosService.getOnePhoto({ id });
-    if (!photo) {
-      throw new HttpException(
-        "Can't to like the photo",
-        HttpStatus.BAD_REQUEST,
-      );
+      const { id: photoId } = photo;
+
+      like = await this.likesRepository.findOne({ where: { userId, photoId } });
+
+      if (like) {
+        throw new HttpException('Like is exist', HttpStatus.CONFLICT);
+      }
+
+      like = new Like();
+      like.user = user;
+      like.photo = photo;
+
+      const rs = await this.likesRepository.save(like);
+      return rs;
+    } catch (error) {
+      throw error;
     }
-    const { id: photoId } = photo;
-
-    like = await this.likesRepository.findOne({ where: { userId, photoId } });
-
-    if (like) {
-      throw new HttpException('Like is exist', HttpStatus.CONFLICT);
-    }
-
-    like = new Like();
-    like.user = user;
-    like.photo = photo;
-
-    const rs = await this.likesRepository.save(like);
-    return rs;
   }
 
   public async countLike(countLike: CountLikedto) {
     const { photoId } = countLike;
-
-    const rs = await this.likesRepository.findAndCount({ where: { photoId } });
-    return rs;
+    try {
+      const rs = await this.likesRepository.findAndCount({
+        where: { photoId },
+      });
+      return rs;
+    } catch (error) {
+      throw error;
+    }
   }
 
   public async unLike(unLike: UnLikedto, userId: string) {
     const { photoId } = unLike;
-    const like = await this.likesRepository.findOne({
-      where: { userId, photoId },
-    });
+    try {
+      const like = await this.likesRepository.findOne({
+        where: { userId, photoId },
+      });
 
-    const rs = await this.likesRepository.remove(like);
-
-    return rs;
+      const rs = await this.likesRepository.remove(like);
+      return rs;
+    } catch (error) {
+      throw error;
+    }
   }
 }

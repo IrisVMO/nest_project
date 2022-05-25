@@ -9,8 +9,8 @@ import {
 } from 'class-validator';
 
 export enum Status {
-  Active = 'Active',
   Busy = 'Busy',
+  Active = 'Active',
 }
 
 export class CreateUserdto {
@@ -29,9 +29,6 @@ export class CreateUserdto {
   @MinLength(6)
   @IsNotEmpty()
   password: string;
-
-  @ApiProperty()
-  env: string;
 }
 
 export class VerifyAccountdto {
@@ -69,6 +66,17 @@ export class SearchUserdto {
   username: string;
 }
 
+export class GetAllUserdto {
+  @ApiProperty({ nullable: true })
+  filter: string;
+
+  @ApiProperty({ nullable: true })
+  take: number;
+
+  @ApiProperty({ nullable: true })
+  page: number;
+}
+
 export class GetOneUserdto {
   @ApiProperty({ nullable: true })
   @IsUUID()
@@ -93,5 +101,6 @@ export class ChangePassworddto {
 export class DeleteOneUser {
   @ApiProperty()
   @IsNotEmpty()
+  @IsUUID()
   id: string;
 }

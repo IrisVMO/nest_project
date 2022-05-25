@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PhotosService } from '../photos/photos.service';
@@ -14,73 +14,84 @@ export class FollowsService {
   ) {}
 
   public async createFollow(user: any) {
-    const follow = new Follow();
-    follow.user = user;
+    try {
+      const follow = new Follow();
+      follow.user = user;
 
-    const rs = await this.followsRepository.save(follow);
+      const rs = await this.followsRepository.save(follow);
+      return rs;
+    } catch (error) {
+      throw error;
+    }
+  }
 
-    return rs;
+  public async deletefollow(userId: string) {
+    try {
+      const rs = await this.followsRepository.findOne({ where: userId });
+      return await this.followsRepository.remove(rs);
+    } catch (error) {
+      throw error;
+    }
   }
 
   public async follow(followdto: Followdto, userId: string) {
-    const { userIdFollowing } = followdto;
+    try {
+      const { userIdFollowing } = followdto;
 
-    const [follower, following] = await Promise.all([
-      this.followsRepository.findOne({ where: { userId } }),
-      this.followsRepository.findOne({ where: { userId: userIdFollowing } }),
-    ]);
+      const [follower, following] = await Promise.all([
+        this.followsRepository.findOne({ where: { userId } }),
+        this.followsRepository.findOne({ where: { userId: userIdFollowing } }),
+      ]);
 
-    follower.userIdFollowing.push(userIdFollowing);
-    following.userIdFollower.push(userId);
+      follower.userIdFollowing.push(userIdFollowing);
+      following.userIdFollower.push(userId);
 
-    // if (!follow) {
-    //   follow = new Follow();
-    //   follow.user = user;
-    //   follow.userIdFollowing = [];
-    //   follow.userIdFollowing.push(userIdFollowing);
-    // }
-
-    // if (follow) {
-    //   const following = follow.userIdFollowing;
-    //   const wasFollow = following.includes(userIdFollowing);
-    //   if (wasFollow) {
-    //     throw new HttpException('Followed this person', HttpStatus.CONFLICT);
-    //   } else {
-    //     follow.userIdFollowing.push(userIdFollowing);
-    //   }
-    // }
-    // follow.userIdFollowing = follow.userIdFollowing.push(userIdFollowing);
-    // follow.userIdFollowing = follow.userIdFollowing.concat(userIdFollowing);
-
-    const rs = await Promise.all([
-      this.followsRepository.save(follower),
-      this.followsRepository.save(following),
-    ]);
-
-    return rs;
+      const rs = await Promise.all([
+        this.followsRepository.save(follower),
+        this.followsRepository.save(following),
+      ]);
+      return rs;
+    } catch (error) {
+      throw error;
+    }
   }
 
   public async newFeed(userId: string) {
-    const follow = await this.followsRepository.findOne({ where: { userId } });
-    if (!follow) {
-      throw new HttpException("You don't follow anyone", HttpStatus.NOT_FOUND);
-    }
-    const following = follow.userIdFollowing.concat(userId);
+    try {
+      const follow = await this.followsRepository.findOne({
+        where: { userId },
+      });
+      const following = follow.userIdFollowing.concat(userId);
 
-    const rs = await this.photosService.newFeed(following);
-    return rs;
+      const rs = await this.photosService.newFeed(following);
+      return rs;
+    } catch (error) {
+      throw error;
+    }
   }
 
   public async unFollow(unFollowdto: UnFollowdto, userId: string) {
     const { userIdFollowing } = unFollowdto;
+    try {
+      const [follower, following] = await Promise.all([
+        this.followsRepository.findOne({ where: { userId } }),
+        this.followsRepository.findOne({ where: { userId: userIdFollowing } }),
+      ]);
 
-    const follow = await this.followsRepository.findOne({ where: { userId } });
+      follower.userIdFollowing = follower.userIdFollowing.filter(
+        (list) => list !== userIdFollowing,
+      );
+      following.userIdFollower = follower.userIdFollower.filter(
+        (list) => list !== userId,
+      );
 
-    follow.userIdFollowing = follow.userIdFollowing.filter(
-      (list) => list !== userIdFollowing,
-    );
-
-    const rs = await this.followsRepository.save(follow);
-    return rs;
+      const rs = await await Promise.all([
+        this.followsRepository.save(follower),
+        this.followsRepository.save(following),
+      ]);
+      return rs;
+    } catch (error) {
+      throw error;
+    }
   }
 }

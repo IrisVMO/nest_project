@@ -20,25 +20,31 @@ export class CommentsService {
 
   public async createComment(commentdto: Commentdto, user: any) {
     const { comment, photoId: id } = commentdto;
+    try {
+      const photo = await this.photosService.getOnePhoto({ id });
 
-    const photo = await this.photosService.getOnePhoto({ id });
+      const comments = new Comment();
+      comments.comment = comment;
+      comments.photo = photo;
+      comments.user = user;
 
-    const comments = new Comment();
-    comments.comment = comment;
-    comments.photo = photo;
-    comments.user = user;
-
-    const rs = await this.commentsRepository.save(comments);
-    return rs;
+      const rs = await this.commentsRepository.save(comments);
+      return rs;
+    } catch (error) {
+      throw error;
+    }
   }
 
   public async getAllCommentPhoto(getAllCommentPhoto: GetAllCommentPhoto) {
     const { photoId } = getAllCommentPhoto;
-
-    const rs = await this.commentsRepository.findAndCount({
-      where: { photoId },
-    });
-    return rs;
+    try {
+      const rs = await this.commentsRepository.findAndCount({
+        where: { photoId },
+      });
+      return rs;
+    } catch (error) {
+      throw error;
+    }
   }
 
   public async updateComment(
@@ -46,15 +52,18 @@ export class CommentsService {
     userId: string,
   ) {
     const { updateComment, photoId } = updateCommentdto;
+    try {
+      const comments = await this.commentsRepository.findOne({
+        where: { photoId, userId },
+      });
 
-    const comments = await this.commentsRepository.findOne({
-      where: { photoId, userId },
-    });
+      comments.comment = updateComment;
 
-    comments.comment = updateComment;
-
-    const rs = await this.commentsRepository.save(comments);
-    return rs;
+      const rs = await this.commentsRepository.save(comments);
+      return rs;
+    } catch (error) {
+      throw error;
+    }
   }
 
   public async deleteComment(
@@ -62,12 +71,15 @@ export class CommentsService {
     userId: string,
   ) {
     const { photoId } = deleteCommentdto;
+    try {
+      const comments = await this.commentsRepository.findOne({
+        where: { photoId, userId },
+      });
 
-    const comments = await this.commentsRepository.findOne({
-      where: { photoId, userId },
-    });
-
-    const rs = await this.commentsRepository.remove(comments);
-    return rs;
+      const rs = await this.commentsRepository.remove(comments);
+      return rs;
+    } catch (error) {
+      throw error;
+    }
   }
 }

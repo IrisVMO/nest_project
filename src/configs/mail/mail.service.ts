@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
+// import { error } from 'console';
 
 @Injectable()
 export class MailService {
@@ -10,7 +11,7 @@ export class MailService {
       .sendMail(option)
       .then()
       .catch((err) => {
-        console.log(err);
+        throw new HttpException('Mailler error', err);
       });
   }
 }

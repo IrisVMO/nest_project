@@ -1,105 +1,144 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
-import { User } from './users.entity';
 import * as bcrypt from 'bcrypt';
-import { CreateUserdto, DeleteOneUser, SearchUserdto } from './users.dto';
+import { FollowsService } from '../follows/follows.service';
+import { User } from './users.entity';
+import { CreateUserdto, DeleteOneUser, GetAllUserdto } from './users.dto';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
+    private readonly followsService: FollowsService,
   ) {}
 
   public async create(createUserDto: CreateUserdto) {
-    const user = new User();
-    user.username = createUserDto.username;
-    user.email = createUserDto.email;
-    user.password = bcrypt.hashSync(`${createUserDto.password}`, 10);
-
-    const rs = await this.usersRepository.save(user);
-    return rs;
+    try {
+      const user = new User();
+      user.username = createUserDto.username;
+      user.email = createUserDto.email;
+      user.password = bcrypt.hashSync(`${createUserDto.password}`, 10);
+      const rs = await this.usersRepository.save(user);
+      await this.followsService.createFollow(rs);
+      return rs;
+    } catch (error) {
+      throw error;
+    }
   }
 
   public async verifyAccount(id: string) {
-    const user = await this.usersRepository.findOne(id);
-    if (!user) {
-      throw new HttpException(
-        'Invalid verify your account',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-    user.tokenVerify = null;
+    try {
+      const user = await this.usersRepository.findOne(id);
 
-    const rs = await this.usersRepository.save(user);
-    return rs;
-  }
+      if (!user) {
+        throw new HttpException(
+          'Invalid verify your account',
+          HttpStatus.NOT_FOUND,
+        );
+      }
 
-  public async findAllUser() {
-    return await this.usersRepository.find();
-  }
+      user.tokenVerify = null;
 
-  public async findOneUser(filter) {
-    const { id, username, email } = filter;
-
-    if (!id) {
-      const rs = await this.usersRepository.findOne({
-        where: [{ email }, { username }],
-      });
+      const rs = await this.usersRepository.save(user);
       return rs;
+    } catch (error) {
+      throw error;
     }
+  }
 
-    const rs = await this.usersRepository.findOne(id);
-    return rs;
+  public async findAllUser(getAllUserdto: GetAllUserdto) {
+    const take = getAllUserdto.take || 10;
+    const page = getAllUserdto.page || 1;
+    const skip = (page - 1) * take;
+    const filter = getAllUserdto.filter || '';
+
+    try {
+      const [result, total] = await this.usersRepository.findAndCount({
+        where: { username: Like(`%${filter}%`) },
+        order: { username: 'ASC' },
+        take: take,
+        skip: skip,
+      });
+
+      return {
+        data: result,
+        count: total,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async findOneUser(filter: any) {
+    const { id, username, email } = filter;
+    try {
+      if (!id) {
+        const rs = await this.usersRepository.findOne({
+          where: [{ email }, { username }],
+        });
+        return rs;
+      }
+
+      const rs = await this.usersRepository.findOne(id);
+      return rs;
+    } catch (error) {
+      throw error;
+    }
   }
 
   public async findAuth(filter: any) {
     const { id, index } = filter;
-
-    const rs = await this.usersRepository.findOne({ where: { id, index } });
-    return rs;
+    try {
+      const rs = await this.usersRepository.findOne({ where: { id, index } });
+      return rs;
+    } catch (error) {
+      throw error;
+    }
   }
 
-  public async searchByUserName(searchUserdto: SearchUserdto) {
-    const { username } = searchUserdto;
-    const rs = await this.usersRepository.find({
-      username: Like(`%${username}%`),
-    });
+  public async updateInforService(updateUserField: any) {
+    const { id, username, tokenVerify, email } = updateUserField;
+    try {
+      const user = await this.usersRepository.findOne(id);
+      user.email = email;
+      user.username = username;
+      user.tokenVerify = tokenVerify;
 
-    return rs;
-  }
-
-  public async updateInforService(updateUserDto: any) {
-    const { id, username, tokenVerify, email } = updateUserDto;
-
-    const user = await this.usersRepository.findOne(id);
-    user.email = email;
-    user.username = username;
-    user.tokenVerify = tokenVerify;
-
-    const rs = await this.usersRepository.save(user);
-
-    return rs;
+      const rs = await this.usersRepository.save(user);
+      return rs;
+    } catch (error) {
+      throw error;
+    }
   }
 
   public async changePasswordService(filter: any) {
     const { id, newPassword, index } = filter;
-    const password = bcrypt.hashSync(newPassword, 10);
+    try {
+      const password = bcrypt.hashSync(newPassword, 10);
 
-    const user = await this.usersRepository.findOne(id);
+      const user = await this.usersRepository.findOne(id);
 
-    user.index = index;
-    user.password = password;
+      user.index = index;
+      user.password = password;
 
-    const rs = await this.usersRepository.save(user);
-    return rs;
+      const rs = await this.usersRepository.save(user);
+      return rs;
+    } catch (error) {
+      throw error;
+    }
   }
 
   public async remove(deleteOneUser: DeleteOneUser) {
-    const { id } = deleteOneUser;
+    try {
+      const { id } = deleteOneUser;
+      await this.followsService.deletefollow(id);
 
-    const rs = await this.usersRepository.delete({ id });
-    return rs;
+      const rs = await this.usersRepository.delete(id);
+      return rs;
+    } catch (error) {
+      throw error;
+    }
   }
 }

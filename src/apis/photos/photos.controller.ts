@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   Res,
   UploadedFile,
@@ -51,6 +52,10 @@ export class PhotosController {
       properties: {
         caption: {
           type: 'string',
+        },
+        albumId: {
+          type: 'string',
+          format: 'uuid',
         },
         image: {
           type: 'string',
@@ -98,7 +103,7 @@ export class PhotosController {
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Get(':id')
+  @Get('getOne/:id')
   @ApiResponse({ status: 200, description: 'Ok' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -113,11 +118,11 @@ export class PhotosController {
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Get('search/:caption')
+  @Get('search')
   @ApiResponse({ status: 200, description: 'Ok' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async searchPhoto(
-    @Param() searchPhotodto: SearchPhotodto,
+    @Query() searchPhotodto: SearchPhotodto,
     @Res() res,
   ) {
     const data = await this.photosService.searchByPhotoCaption(searchPhotodto);

@@ -7,8 +7,13 @@ export enum Status {
 }
 
 export class CreatePhotodto {
-  @ApiProperty()
+  @ApiProperty({ example: 'Mot ngay nang rat to ...' })
   caption: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsUUID()
+  albumId: string;
 }
 
 export class GetOnePhotodto {
@@ -20,7 +25,13 @@ export class GetOnePhotodto {
 
 export class SearchPhotodto {
   @ApiProperty()
-  caption: string;
+  filter: string;
+
+  @ApiProperty()
+  take: number;
+
+  @ApiProperty()
+  page: number;
 }
 
 export class DeleteOnePhotodto {

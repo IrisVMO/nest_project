@@ -13,7 +13,6 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Likedto, CountLikedto, UnLikedto } from './likes.dto';
 import { LikesService } from './likes.service';
-// import { UsersService } from '../users/users.service';
 
 @ApiTags('Likes')
 @Controller('api/likes')

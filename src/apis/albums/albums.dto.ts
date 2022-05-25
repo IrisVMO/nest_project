@@ -34,8 +34,14 @@ export class GetAllPhotoInAlbumdto {
 }
 
 export class SearchAlbumdto {
-  @ApiProperty({ example: 'Seas' })
-  name: string;
+  @ApiProperty({ example: 'Seas', nullable: true })
+  filter: string;
+
+  @ApiProperty()
+  take: number;
+
+  @ApiProperty()
+  page: number;
 }
 
 export class UpdateAlbumdto {

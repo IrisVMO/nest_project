@@ -4,12 +4,10 @@ import {
   JoinColumn,
   OneToOne,
   PrimaryGeneratedColumn,
-  Unique,
 } from 'typeorm';
 import { User } from '../users/users.entity';
 
 @Entity({ name: 'Follow' })
-@Unique(['userIdFollowing'])
 export class Follow {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -29,7 +27,7 @@ export class Follow {
   })
   public userIdFollower: string[];
 
-  @OneToOne(() => User, (user) => user.follows)
+  @OneToOne(() => User, (user) => user.follow)
   @JoinColumn()
   user: User;
 }

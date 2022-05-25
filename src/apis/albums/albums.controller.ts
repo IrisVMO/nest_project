@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   Res,
   UseGuards,
@@ -17,7 +18,7 @@ import { AlbumsService } from './albums.service';
 import {
   CreateAlbumDto,
   GetOneAlbumdto,
-  GetAllPhotoInAlbumdto,
+  // GetAllPhotoInAlbumdto,
   UpdateAlbumdto,
   DeleteAlbumdto,
   ParamUpdateAlbumdto,
@@ -49,13 +50,12 @@ export class AlbumsController {
       createAlbumDto,
       req.user,
     );
-
     res.json({ data });
   }
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Get(':id')
+  @Get('getOne/:id')
   @ApiResponse({ status: 200, description: 'Ok' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -69,33 +69,32 @@ export class AlbumsController {
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Get('search/:name')
+  @Get('search')
   @ApiResponse({ status: 200, description: 'Ok' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async searchPhoto(
-    @Param() searchPhotodto: SearchAlbumdto,
+    @Query() searchPhotodto: SearchAlbumdto,
     @Res() res,
   ) {
     const data = await this.albumsService.searchByAlbumName(searchPhotodto);
-
     res.json({ data });
   }
 
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
-  @Get('allPhotoInAlbum/:id')
-  @ApiResponse({ status: 200, description: 'Ok' })
-  @ApiResponse({ status: 400, description: 'Bad request' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  public async getAllPhotoInAlbum(
-    @Res() res,
-    @Param() getAllPhotoInAlbumdto: GetAllPhotoInAlbumdto,
-  ) {
-    const data = await this.albumsService.getAllPhotoInAlbum(
-      getAllPhotoInAlbumdto,
-    );
-    res.json({ data });
-  }
+  // @ApiBearerAuth()
+  // @UseGuards(AuthGuard('jwt'))
+  // @Get('allPhotoInAlbum/:id')
+  // @ApiResponse({ status: 200, description: 'Ok' })
+  // @ApiResponse({ status: 400, description: 'Bad request' })
+  // @ApiResponse({ status: 401, description: 'Unauthorized' })
+  // public async getAllPhotoInAlbum(
+  //   @Res() res,
+  //   @Param() getAllPhotoInAlbumdto: GetAllPhotoInAlbumdto,
+  // ) {
+  //   const data = await this.albumsService.getAllPhotoInAlbum(
+  //     getAllPhotoInAlbumdto,
+  //   );
+  //   res.json({ data });
+  // }
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))

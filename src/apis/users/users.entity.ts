@@ -51,7 +51,7 @@ export class User {
   updatedAt: Date;
 
   @OneToOne(() => Follow, (follow) => follow.user)
-  follows: Follow[];
+  follow: Follow;
 
   @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];
