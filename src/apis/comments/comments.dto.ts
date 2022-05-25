@@ -36,5 +36,5 @@ export class DeleteCommentdto {
   @ApiProperty()
   @IsUUID()
   @IsNotEmpty()
-  photoId: string;
+  id: string;
 }

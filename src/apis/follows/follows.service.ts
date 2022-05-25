@@ -27,8 +27,12 @@ export class FollowsService {
 
   public async deletefollow(userId: string) {
     try {
-      const rs = await this.followsRepository.findOne({ where: userId });
-      return await this.followsRepository.remove(rs);
+      const followTable = await this.followsRepository.findOne({
+        where: { userId },
+      });
+
+      const rs = await this.followsRepository.remove(followTable);
+      return rs;
     } catch (error) {
       throw error;
     }
@@ -85,7 +89,7 @@ export class FollowsService {
         (list) => list !== userId,
       );
 
-      const rs = await await Promise.all([
+      const rs = await Promise.all([
         this.followsRepository.save(follower),
         this.followsRepository.save(following),
       ]);

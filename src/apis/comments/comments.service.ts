@@ -66,17 +66,10 @@ export class CommentsService {
     }
   }
 
-  public async deleteComment(
-    deleteCommentdto: DeleteCommentdto,
-    userId: string,
-  ) {
-    const { photoId } = deleteCommentdto;
+  public async deleteComment(deleteCommentdto: DeleteCommentdto) {
+    const { id } = deleteCommentdto;
     try {
-      const comments = await this.commentsRepository.findOne({
-        where: { photoId, userId },
-      });
-
-      const rs = await this.commentsRepository.remove(comments);
+      const rs = await this.commentsRepository.delete({ id });
       return rs;
     } catch (error) {
       throw error;

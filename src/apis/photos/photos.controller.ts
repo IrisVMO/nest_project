@@ -143,8 +143,6 @@ export class PhotosController {
     @Res() res,
   ) {
     try {
-      console.log('allPhotoInAlbum:', allPhotoInAlbum);
-
       const data = await this.photosService.getAllLikeInPhoto(allPhotoInAlbum);
       res.json({ data });
     } catch (error) {

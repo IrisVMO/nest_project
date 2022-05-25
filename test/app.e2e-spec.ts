@@ -8,25 +8,30 @@ import {
   UpdateInfordto,
 } from '../src/apis/users/users.dto';
 import { AppModule } from '../src/app.module';
-// import { data_test } from './data';
 import { CreateAlbumDto, UpdateAlbumdto } from '../src/apis/albums/albums.dto';
 
 const data_test = {
-  user: {
-    username: '3ded2ewe232',
-    email: 'name32eaem2222@gmail.com',
+  user1: {
+    username: '3de2d2ew3e232',
+    email: 'name32e2a2em2222@gmail.com',
     password: '1232456',
   },
 
-  userUpdate: {
-    username: 'nam21s23',
-    email: 'nam1223s4@gmail.com',
+  userUpdate1: {
+    username: 'nam221s23',
+    email: 'nam12223s4@gmail.com',
     status: 'Busy',
   },
 
-  userChangePassword: {
+  userChangePassword1: {
     currentPassword: '1232456',
-    newPassword: 'nam123456',
+    newPassword: 'nam1234256',
+  },
+
+  user2: {
+    username: '32ded222ew3e232',
+    email: 'name32222ea2em2222@gmail.com',
+    password: '1232456',
   },
 
   album: {
@@ -53,17 +58,18 @@ const data_test = {
     comment: 'Anh nay dep dep',
   },
 
-  follows: {
-    userIdFollowing: '5e36d1fb-a051-4152-9486-d7a574998569',
-  },
-
   commentUpdates: {
     commentUpdate: 'Cute is not FoUND',
   },
 };
 
 let app: INestApplication;
-let accessToken: string, photo: any, album: any, user: any;
+let accessToken: string,
+  photo: any,
+  album: any,
+  user1: any,
+  user2: any,
+  comment: any;
 
 // Feature Users
 describe('E2e test feature Users', () => {
@@ -74,6 +80,7 @@ describe('E2e test feature Users', () => {
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
+
     await app.init();
   });
 
@@ -81,14 +88,14 @@ describe('E2e test feature Users', () => {
   it('Create [POST /api/users/signup]', async () => {
     await request(app.getHttpServer())
       .post('/api/users/signup')
-      .send(data_test.user as CreateUserdto)
+      .send(data_test.user1 as CreateUserdto)
       .expect(201);
   });
 
   it('Create [POST /api/users/signup] Conflic', async () => {
     await request(app.getHttpServer())
       .post('/api/users/signup')
-      .send(data_test.user as CreateUserdto)
+      .send(data_test.user1 as CreateUserdto)
       .expect(409);
   });
 
@@ -99,14 +106,23 @@ describe('E2e test feature Users', () => {
       .expect(400);
   });
 
+  it('Create [POST /api/users/signup]', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/api/users/signup')
+      .send(data_test.user2 as CreateUserdto)
+      .expect(201);
+
+    user2 = response.body.data;
+  });
+
   // Login
   it('Create [POST /api/users/login]', async () => {
     const response = await request(app.getHttpServer())
       .post('/api/users/login')
-      .send(data_test.user as Logindto)
+      .send(data_test.user1 as Logindto)
       .expect(201);
 
-    user = response.body.data;
+    user1 = response.body.data;
     accessToken = response.body.accessToken;
   });
 
@@ -122,7 +138,7 @@ describe('E2e test feature Users', () => {
     await request(app.getHttpServer())
       .patch(`/api/users`)
       .set({ Authorization: `Bearer ${accessToken}` })
-      .send(data_test.userUpdate as UpdateInfordto)
+      .send(data_test.userUpdate1 as UpdateInfordto)
       .expect(200);
   });
 
@@ -138,14 +154,14 @@ describe('E2e test feature Users', () => {
     await request(app.getHttpServer())
       .patch(`/api/users`)
       .set({ Authorization: 'Bearer' })
-      .send(data_test.userUpdate as UpdateInfordto)
+      .send(data_test.userUpdate1 as UpdateInfordto)
       .expect(401);
   });
 
   // Get One User
   it('Create [GET /api/users/one/:id]', async () => {
     await request(app.getHttpServer())
-      .get(`/api/users/one/${user.id}`)
+      .get(`/api/users/one/${user1.id}`)
       .set({ Authorization: `Bearer ${accessToken}` })
       .expect(200);
   });
@@ -159,7 +175,7 @@ describe('E2e test feature Users', () => {
 
   it('Create [GET /api/users/one/:id] 401 Unauthorization', async () => {
     await request(app.getHttpServer())
-      .get(`/api/users/one/${user.id}`)
+      .get(`/api/users/one/${user1.id}`)
       .set({ Authorization: 'Bearer' })
       .expect(401);
   });
@@ -199,7 +215,7 @@ describe('E2e test feature Users', () => {
     await request(app.getHttpServer())
       .patch('/api/users/changePassword')
       .set({ Authorization: 'Bearer' })
-      .send(data_test.userChangePassword as ChangePassworddto)
+      .send(data_test.userChangePassword1 as ChangePassworddto)
       .expect(401);
   });
 
@@ -207,7 +223,7 @@ describe('E2e test feature Users', () => {
     await request(app.getHttpServer())
       .patch('/api/users/changePassword')
       .set({ Authorization: `Bearer ${accessToken}` })
-      .send(data_test.userChangePassword as ChangePassworddto)
+      .send(data_test.userChangePassword1 as ChangePassworddto)
       .expect(200);
   });
 
@@ -215,12 +231,12 @@ describe('E2e test feature Users', () => {
     const response = await request(app.getHttpServer())
       .post('/api/users/login')
       .send({
-        username: data_test.userUpdate.username,
-        password: data_test.userChangePassword.newPassword,
+        username: data_test.userUpdate1.username,
+        password: data_test.userChangePassword1.newPassword,
       })
       .expect(201);
 
-    user = response.body.data;
+    user1 = response.body.data;
     accessToken = response.body.accessToken;
   });
 });
@@ -316,28 +332,6 @@ describe('E2e test feature Albums', () => {
       .send(data_test.albumUpdate as UpdateAlbumdto)
       .expect(401);
   });
-
-  // // Delete Albums
-  // it('Create [DELETE /api/albums/:id]', async () => {
-  //   await request(app.getHttpServer())
-  //     .delete(`/api/albums/${album.id}`)
-  //     .set({ Authorization: `Bearer ${accessToken}` })
-  //     .expect(200);
-  // });
-
-  // it('Create [DELETE /api/albums/:id] 400 Bad Request', async () => {
-  //   await request(app.getHttpServer())
-  //     .delete(`/api/albums/${'id'}`)
-  //     .set({ Authorization: `Bearer ${accessToken}` })
-  //     .expect(400);
-  // });
-
-  // it('Create [DELETE /api/albums/:id] 401 Unauthorization', async () => {
-  //   await request(app.getHttpServer())
-  //     .delete(`/api/albums/${album.id}`)
-  //     .set({ Authorization: 'Bearer' })
-  //     .expect(401);
-  // });
 });
 
 //=====================================================================
@@ -448,28 +442,6 @@ describe('E2e test feature Photos', () => {
       .send(data_test.photoUpdate)
       .expect(401);
   });
-
-  // // Delete Photo
-  // it('Create [DELETE /api/photos/:id]', async () => {
-  //   await request(app.getHttpServer())
-  //     .delete(`/api/photos/${photo.id}`)
-  //     .set({ Authorization: `Bearer ${accessToken}` })
-  //     .expect(200);
-  // });
-
-  // it('Create [DELETE /api/photos/:id] 400 Bad Request', async () => {
-  //   await request(app.getHttpServer())
-  //     .delete(`/api/photos/${'id'}`)
-  //     .set({ Authorization: `Bearer ${accessToken}` })
-  //     .expect(400);
-  // });
-
-  // it('Create [DELETE /api/photos/:id] 401 Unauthorization', async () => {
-  //   await request(app.getHttpServer())
-  //     .delete(`/api/photos/${photo.id}`)
-  //     .set({ Authorization: 'Bearer' })
-  //     .expect(401);
-  // });
 });
 
 //=======================================================================
@@ -547,7 +519,6 @@ describe('E2e test feature Likes', () => {
       .set({ Authorization: 'Bearer' })
       .expect(401);
   });
-  afterAll(() => app.close());
 });
 
 //=====================================================================
@@ -555,11 +526,13 @@ describe('E2e test feature Likes', () => {
 describe('E2e test feature Comments', () => {
   // Create Comment
   it('Create [POST /api/comments]', async () => {
-    await request(app.getHttpServer())
+    const response = await request(app.getHttpServer())
       .post('/api/comments')
       .set({ Authorization: `Bearer ${accessToken}` })
       .send({ comment: data_test.comments.comment, photoId: photo.id })
       .expect(201);
+
+    comment = response.body.data;
   });
 
   it('Create [POST /api/comments] 400 Bad Request', async () => {
@@ -614,7 +587,7 @@ describe('E2e test feature Comments', () => {
     await request(app.getHttpServer())
       .get(`/api/comments/allCommentInPhoto/${photo.id}`)
       .set({ Authorization: `Bearer ${accessToken}` })
-      .expect(201);
+      .expect(200);
   });
 
   it('Create [GET /api/comments/allCommentInPhoto/:photoId] 400 Bad Request', async () => {
@@ -632,17 +605,16 @@ describe('E2e test feature Comments', () => {
   });
 
   // Delete Comment
-  it('Create [DELETE /api/comments]', async () => {
+  it('Create [DELETE /api/comments/:id]', async () => {
     await request(app.getHttpServer())
-      .delete(`/api/comments`)
+      .delete(`/api/comments/${comment.id}`)
       .set({ Authorization: `Bearer ${accessToken}` })
-      .send({ photoId: photo.id })
-      .expect(201);
+      .expect(200);
   });
 
   it('Create [DELETE /api/comments] 400 Bad Request', async () => {
     await request(app.getHttpServer())
-      .delete(`/api/comments`)
+      .delete(`/api/comments/${'absnse'}`)
       .set({ Authorization: `Bearer ${accessToken}` })
       .send(null)
       .expect(400);
@@ -650,108 +622,151 @@ describe('E2e test feature Comments', () => {
 
   it('Create [DELETE /api/comments] 401 Unauthorization', async () => {
     await request(app.getHttpServer())
-      .delete(`/api/comments`)
+      .delete(`/api/comments/${'dd'}`)
       .set({ Authorization: 'Bearer' })
-      .send({ photoId: photo.id })
       .expect(401);
   });
 });
 
-// //===========================================================================
-// // Feature Follows
-// describe('E2e test feature Follows', () => {
-//   // Create Follow
-//   it('Create [POST /api/follows]', async () => {
-//     await request(app.getHttpServer())
-//       .post('/api/follows')
-//       .set({ Authorization: `Bearer ${accessToken}` })
-//       .send({ userIdFollowing: data_test.follows.userIdFollowing })
-//       .expect(201);
-//   });
+//===========================================================================
+// Feature Follows
+describe('E2e test feature Follows', () => {
+  // Create Follow
+  it('Create [POST /api/follows]', async () => {
+    await request(app.getHttpServer())
+      .post('/api/follows')
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .send({ userIdFollowing: user2.id })
+      .expect(201);
+  });
 
-//   it('Create [POST /api/follows] 400 Bad Request', async () => {
-//     await request(app.getHttpServer())
-//       .post('/api/follows')
-//       .set({ Authorization: `Bearer ${accessToken}` })
-//       .send(null)
-//       .expect(400);
-//   });
+  it('Create [POST /api/follows] 400 Bad Request', async () => {
+    await request(app.getHttpServer())
+      .post('/api/follows')
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .send(null)
+      .expect(400);
+  });
 
-//   it('Create [POST /api/follows] 401 Unauthorization', async () => {
-//     await request(app.getHttpServer())
-//       .post('/api/follows')
-//       .set({ Authorization: 'Bearer' })
-//       .send({ userIdFollowing: data_test.follows.userIdFollowing })
-//       .expect(401);
-//   });
+  it('Create [POST /api/follows] 401 Unauthorization', async () => {
+    await request(app.getHttpServer())
+      .post('/api/follows')
+      .set({ Authorization: 'Bearer' })
+      .send({ userIdFollowing: user2.id })
+      .expect(401);
+  });
 
-//   // New Feed
-//   it('Create [GET /api/follows/newFeed]', async () => {
-//     await request(app.getHttpServer())
-//       .get(`/api/follows/newFeed`)
-//       .set({ Authorization: `Bearer ${accessToken}` })
-//       .expect(201);
-//   });
+  // New Feed
+  it('Create [GET /api/follows/newFeed]', async () => {
+    await request(app.getHttpServer())
+      .get(`/api/follows/newFeed`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .expect(200);
+  });
 
-//   it('Create [GET /api/follows/newFeed] 401 Unauthorization', async () => {
-//     await request(app.getHttpServer())
-//       .post(`/api/follows/newFeed`)
-//       .set({ Authorization: 'Bearer' })
-//       .expect(401);
-//   });
+  it('Create [GET /api/follows/newFeed] 401 Unauthorization', async () => {
+    await request(app.getHttpServer())
+      .get(`/api/follows/newFeed`)
+      .set({ Authorization: 'Bearer' })
+      .expect(401);
+  });
 
-//   // Unfollow
-//   it('Create [DELETE /api/follows/:id]', async () => {
-//     await request(app.getHttpServer())
-//       .delete(`/api/follows/${album.id}`)
-//       .send({ userIdFollowing: data_test.follows.userIdFollowing })
-//       .expect(200);
-//   });
+  // Unfollow
+  it('Create [DELETE /api/follows/:id]', async () => {
+    await request(app.getHttpServer())
+      .delete(`/api/follows/${user2.id}`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .expect(200);
+  });
 
-//   it('Create [DELETE /api/follows/:id] 400 Bad Request', async () => {
-//     await request(app.getHttpServer())
-//       .delete(`/api/follows/${'id'}`)
-//       .set({ Authorization: `Bearer ${accessToken}` })
-//       .send(null)
-//       .expect(400);
-//   });
+  it('Create [DELETE /api/follows/:id] 400 Bad Request', async () => {
+    await request(app.getHttpServer())
+      .delete(`/api/follows/${'id'}`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .expect(400);
+  });
 
-//   it('Create [DELETE /api/follows/:id] 401 Unauthorization', async () => {
-//     await request(app.getHttpServer())
-//       .delete(`/api/follows/${album.id}`)
-//       .set({ Authorization: 'Bearer' })
-//       .send({ userIdFollowing: data_test.follows.userIdFollowing })
-//       .expect(401);
-//   });
+  it('Create [DELETE /api/follows/:id] 401 Unauthorization', async () => {
+    await request(app.getHttpServer())
+      .delete(`/api/follows/${user2.id}`)
+      .set({ Authorization: 'Bearer' })
+      .expect(401);
+  });
+});
 
-//   // afterAll(() => app.close());
-// });
+describe('E2e test feature Photos', () => {
+  // Delete Photo
+  it('Create [DELETE /api/photos/:id]', async () => {
+    await request(app.getHttpServer())
+      .delete(`/api/photos/${photo.id}`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .expect(200);
+  });
 
-// //=========================================================================
-// // Feature Users
-// describe('E2e test feature Users', () => {
-//   // Delete User
+  it('Create [DELETE /api/photos/:id] 400 Bad Request', async () => {
+    await request(app.getHttpServer())
+      .delete(`/api/photos/${'id'}`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .expect(400);
+  });
 
-//   it('Create [Delete /api/users/:id]', async () => {
-//     await request(app.getHttpServer())
-//       .delete(`/api/users/${user.id}`)
-//       .set({ Authorization: `Bearer ${accessToken}` })
-//       .expect(200);
-//   });
+  it('Create [DELETE /api/photos/:id] 401 Unauthorization', async () => {
+    await request(app.getHttpServer())
+      .delete(`/api/photos/${photo.id}`)
+      .set({ Authorization: 'Bearer' })
+      .expect(401);
+  });
+});
 
-//   it('Create [Delete /api/users/:id] 400 Bad request', async () => {
-//     await request(app.getHttpServer())
-//       .delete(`/api/users/random`)
-//       .set({ Authorization: `Bearer ${accessToken}` })
-//       .expect(400);
-//   });
+describe('E2e test feature Albums', () => {
+  // Delete Albums
+  it('Create [DELETE /api/albums/:id]', async () => {
+    await request(app.getHttpServer())
+      .delete(`/api/albums/${album.id}`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .expect(200);
+  });
 
-//   it('Create [Delete /api/users/:id] 401 Unauthorization', async () => {
-//     await request(app.getHttpServer())
-//       .delete(`/api/users/${user.id}`)
-//       .set({ Authorization: 'Bearer' })
-//       .expect(401);
-//   });
+  it('Create [DELETE /api/albums/:id] 400 Bad Request', async () => {
+    await request(app.getHttpServer())
+      .delete(`/api/albums/${'id'}`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .expect(400);
+  });
 
-// afterAll(() => app.close());
-// });
+  it('Create [DELETE /api/albums/:id] 401 Unauthorization', async () => {
+    await request(app.getHttpServer())
+      .delete(`/api/albums/${album.id}`)
+      .set({ Authorization: 'Bearer' })
+      .expect(401);
+  });
+});
+
+//=========================================================================
+// Feature Users
+describe('E2e test feature Users', () => {
+  // Delete User
+
+  it('Create [Delete /api/users/:id] 400 Bad request', async () => {
+    await request(app.getHttpServer())
+      .delete(`/api/users/random`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .expect(400);
+  });
+
+  it('Create [Delete /api/users/:id] 401 Unauthorization', async () => {
+    await request(app.getHttpServer())
+      .delete(`/api/users/${user1.id}`)
+      .set({ Authorization: 'Bearer' })
+      .expect(401);
+  });
+
+  it('Create [Delete /api/users/:id]', async () => {
+    await request(app.getHttpServer())
+      .delete(`/api/users/${user1.id}`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .expect(200);
+  });
+
+  afterAll(() => app.close());
+});

@@ -91,22 +91,16 @@ export class CommentsController {
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Delete()
+  @Delete(':id')
   @ApiResponse({ status: 200, description: 'Ok' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async deleteComment(
-    @Body() deleteCommentdto: DeleteCommentdto,
+    @Param() deleteCommentdto: DeleteCommentdto,
     @Res() res,
-    @Req() req,
   ) {
-    const { id: userId } = req.user;
     try {
-      const data = await this.commentsService.deleteComment(
-        deleteCommentdto,
-        userId,
-      );
-
+      const data = await this.commentsService.deleteComment(deleteCommentdto);
       res.json({ data });
     } catch (error) {
       throw error;

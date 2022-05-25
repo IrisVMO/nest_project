@@ -13,6 +13,7 @@ import {
   Patch,
   Inject,
   Query,
+  BadRequestException
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
@@ -66,23 +67,23 @@ export class UsersController {
       }
 
       const user = await this.usersService.create(createUserDto);
-      const { id } = user;
-      // const { env } = createUserDto;
-      if (process.env.NODE_ENV != 'test') {
-        const tokenVerify = this.jwtService.sign({ id });
-        const option = {
-          from: configs.emailHelper,
-          to: user.email,
-          subject: 'Wellcom to UNIVERSE PHOTOS',
-          html: `<p>
-              Please verify your account
-              <a href='http://${configs.host}:${configs.port}/api/users/verify/${tokenVerify}'>Verify Account</a>
-            </p>`,
-        };
+      // const { id } = user;
 
-        await this.usersService.updateInforService({ tokenVerify, id });
-        this.mailService.sendMail(option);
-      }
+      // if (process.env.NODE_ENV != 'test') {
+      //   const tokenVerify = this.jwtService.sign({ id });
+      //   const option = {
+      //     from: configs.emailHelper,
+      //     to: user.email,
+      //     subject: 'Wellcom to UNIVERSE PHOTOS',
+      //     html: `<p>
+      //         Please verify your account
+      //         <a href='http://${configs.host}:${configs.port}/api/users/verify/${tokenVerify}'>Verify Account</a>
+      //       </p>`,
+      //   };
+
+      //   await this.usersService.updateInforService({ tokenVerify, id });
+      //   this.mailService.sendMail(option);
+      // }
 
       res.json({ data: user });
     } catch (error) {
@@ -114,18 +115,19 @@ export class UsersController {
       const user = await this.usersService.findOneUser(loginDto);
 
       if (!user) {
+        // throw new HttpException(
+        //   'Email or username wrong',
+        //   HttpStatus.BAD_REQUEST,
+        // );
+        throw new BadRequestException('Email or username wrong');
+      }
+
+      if (user.tokenVerify) {
         throw new HttpException(
-          'Email or username wrong',
+          'Please verify account in your email address',
           HttpStatus.BAD_REQUEST,
         );
       }
-
-      // if (user.tokenVerify) {
-      //   throw new HttpException(
-      //     'Please verify account in your email address',
-      //     HttpStatus.BAD_REQUEST,
-      //   );
-      // }
 
       const result = bcrypt.compareSync(loginDto.password, user.password);
 

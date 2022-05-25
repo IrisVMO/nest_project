@@ -44,6 +44,18 @@ export class SearchAlbumdto {
   page: number;
 }
 
+export class InviteContributedto {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsUUID()
+  id: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsUUID()
+  userContribueId: string;
+}
+
 export class UpdateAlbumdto {
   @ApiProperty()
   @IsNotEmpty()

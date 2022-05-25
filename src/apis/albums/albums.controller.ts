@@ -23,6 +23,7 @@ import {
   DeleteAlbumdto,
   ParamUpdateAlbumdto,
   SearchAlbumdto,
+  InviteContributedto,
 } from './albums.dto';
 import { MailService } from '../../configs/mail/mail.service';
 
@@ -77,6 +78,26 @@ export class AlbumsController {
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
+  @Get('getOne/:id')
+  @ApiResponse({ status: 200, description: 'Ok' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  public async inviteContribute(
+    @Res() res,
+    @Param() inviteContributedto: InviteContributedto,
+  ) {
+    try {
+      const data = await this.albumsService.inviteContribute(
+        inviteContributedto,
+      );
+      res.json({ data });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @Get('search')
   @ApiResponse({ status: 200, description: 'Ok' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -91,22 +112,6 @@ export class AlbumsController {
       throw error;
     }
   }
-
-  // @ApiBearerAuth()
-  // @UseGuards(AuthGuard('jwt'))
-  // @Get('allPhotoInAlbum/:id')
-  // @ApiResponse({ status: 200, description: 'Ok' })
-  // @ApiResponse({ status: 400, description: 'Bad request' })
-  // @ApiResponse({ status: 401, description: 'Unauthorized' })
-  // public async getAllPhotoInAlbum(
-  //   @Res() res,
-  //   @Param() getAllPhotoInAlbumdto: GetAllPhotoInAlbumdto,
-  // ) {
-  //   const data = await this.albumsService.getAllPhotoInAlbum(
-  //     getAllPhotoInAlbumdto,
-  //   );
-  //   res.json({ data });
-  // }
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))

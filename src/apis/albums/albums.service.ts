@@ -1,22 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { Like, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Album } from './albums.entity';
+import { Album, AlbumUser, StatusAlbumUser } from './albums.entity';
 import {
   CreateAlbumDto,
   DeleteAlbumdto,
-  // GetAllPhotoInAlbumdto,
+  InviteContributedto,
   SearchAlbumdto,
   ParamUpdateAlbumdto,
   UpdateAlbumdto,
 } from './albums.dto';
-// import { PhotosService } from '../photos/photos.service';
+// import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AlbumsService {
   constructor(
     @InjectRepository(Album)
-    private readonly albumsRepository: Repository<Album>, // private readonly photosService: PhotosService,
+    private readonly albumsRepository: Repository<Album>,
+    // private readonly albumUsersRepository: Repository<AlbumUser>,
+    // private readonly usersService: UsersService,
   ) {}
 
   public async createAlbumService(createAlbumDto: CreateAlbumDto, user: any) {
@@ -65,17 +67,21 @@ export class AlbumsService {
     }
   }
 
-  // public async getAllPhotoInAlbum(
-  //   getAllPhotoInAlbumdto: GetAllPhotoInAlbumdto,
-  // ) {
-  //   const { id } = getAllPhotoInAlbumdto;
-  //   try {
-  //     const rs = await this.photosService.getAllPhotoInAlbum(id);
-  //     return rs;
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // }
+  public async inviteContribute(inviteContributedto: InviteContributedto) {
+    const { id, userContribueId } = inviteContributedto;
+    const albumUser = new AlbumUser();
+
+    try {
+      // const user = await this.usersService.findOneUser({ id: userContribueId });
+      const album = await this.albumsRepository.findOne(id);
+      albumUser.role = 'Contribue';
+      albumUser.status = StatusAlbumUser.Inactive;
+      //   albumUser
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  }
 
   public async updateAlbum(
     updateAlbumDto: UpdateAlbumdto,
