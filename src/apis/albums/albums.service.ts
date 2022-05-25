@@ -40,17 +40,17 @@ export class AlbumsService {
       //   relations: ['photos'],
       // });
 
-      // const rs = await this.albumsRepository
-      //   .createQueryBuilder()
-      //   .leftJoinAndSelect('Album.photos', 'Photo')
-      //   .where('Album.id = :id', { id })
-      //   .getOne();
+      const rs = await this.albumsRepository
+        .createQueryBuilder()
+        .leftJoinAndSelect('Album.photos', 'Photo')
+        .where('Album.id = :id', { id })
+        .getOne();
 
-      const rs = await this.albumsRepository.query(
-        `SELECT * 
-        FROM "Album" LEFT JOIN "Photo" ON Album."id"='${id}' Album."id"=Photo."albumId"
-        `,
-      );
+      // const rs = await this.albumsRepository.query(
+      //   `SELECT * 
+      //   FROM "Album" LEFT JOIN "Photo" ON Album."id"='${id}' Album."id"=Photo."albumId"
+      //   `,
+      // );
       return rs;
     } catch (error) {
       throw error;
