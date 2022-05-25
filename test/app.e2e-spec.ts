@@ -317,27 +317,27 @@ describe('E2e test feature Albums', () => {
       .expect(401);
   });
 
-  // Delete Albums
-  it('Create [DELETE /api/albums/:id]', async () => {
-    await request(app.getHttpServer())
-      .delete(`/api/albums/${album.id}`)
-      .set({ Authorization: `Bearer ${accessToken}` })
-      .expect(200);
-  });
+  // // Delete Albums
+  // it('Create [DELETE /api/albums/:id]', async () => {
+  //   await request(app.getHttpServer())
+  //     .delete(`/api/albums/${album.id}`)
+  //     .set({ Authorization: `Bearer ${accessToken}` })
+  //     .expect(200);
+  // });
 
-  it('Create [DELETE /api/albums/:id] 400 Bad Request', async () => {
-    await request(app.getHttpServer())
-      .delete(`/api/albums/${'id'}`)
-      .set({ Authorization: `Bearer ${accessToken}` })
-      .expect(400);
-  });
+  // it('Create [DELETE /api/albums/:id] 400 Bad Request', async () => {
+  //   await request(app.getHttpServer())
+  //     .delete(`/api/albums/${'id'}`)
+  //     .set({ Authorization: `Bearer ${accessToken}` })
+  //     .expect(400);
+  // });
 
-  it('Create [DELETE /api/albums/:id] 401 Unauthorization', async () => {
-    await request(app.getHttpServer())
-      .delete(`/api/albums/${album.id}`)
-      .set({ Authorization: 'Bearer' })
-      .expect(401);
-  });
+  // it('Create [DELETE /api/albums/:id] 401 Unauthorization', async () => {
+  //   await request(app.getHttpServer())
+  //     .delete(`/api/albums/${album.id}`)
+  //     .set({ Authorization: 'Bearer' })
+  //     .expect(401);
+  // });
 });
 
 //=====================================================================
@@ -381,23 +381,45 @@ describe('E2e test feature Photos', () => {
   });
 
   // Get one photo by id
-  it('Create [GET /api/photos/:id]', async () => {
+  it('Create [GET /api/photos/getOne/:id]', async () => {
     await request(app.getHttpServer())
       .get(`/api/photos/getOne/${photo.id}`)
       .set({ Authorization: `Bearer ${accessToken}` })
       .expect(200);
   });
 
-  it('Create [GET /api/photos/:id] 401 Unauthorization', async () => {
+  it('Create [GET /api/photos/getOne/:id] 401 Unauthorization', async () => {
     request(app.getHttpServer())
       .get(`/api/photos/getOne/${'photo.id'}`)
       .set({ Authorization: `Bearer ${accessToken}` })
       .expect(400);
   });
 
-  it('Create [GET /api/photos/:id] 401 Unauthorization', async () => {
+  it('Create [GET /api/photos/getOne/:id] 401 Unauthorization', async () => {
     request(app.getHttpServer())
       .get(`/api/photos/getOne/${photo.id}`)
+      .set({ Authorization: `Bearer` })
+      .expect(401);
+  });
+
+  // Get all photo in an album
+  it('Create [GET /api/photos/allPhotoInAlbum/:albumId]', async () => {
+    await request(app.getHttpServer())
+      .get(`/api/photos/allPhotoInAlbum/${album.id}`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .expect(200);
+  });
+
+  it('Create [GET /api/photos/allPhotoInAlbum/:albumId] 401 Unauthorization', async () => {
+    request(app.getHttpServer())
+      .get(`/api/photos/allPhotoInAlbum/${'album.id'}`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .expect(400);
+  });
+
+  it('Create [GET /api/photos/allPhotoInAlbum/:albumId] 401 Unauthorization', async () => {
+    request(app.getHttpServer())
+      .get(`/api/photos/allPhotoInAlbum/${'album.id'}`)
       .set({ Authorization: `Bearer` })
       .expect(401);
   });
@@ -427,27 +449,27 @@ describe('E2e test feature Photos', () => {
       .expect(401);
   });
 
-  // Delete Photo
-  it('Create [DELETE /api/photos/:id]', async () => {
-    await request(app.getHttpServer())
-      .delete(`/api/photos/${photo.id}`)
-      .set({ Authorization: `Bearer ${accessToken}` })
-      .expect(200);
-  });
+  // // Delete Photo
+  // it('Create [DELETE /api/photos/:id]', async () => {
+  //   await request(app.getHttpServer())
+  //     .delete(`/api/photos/${photo.id}`)
+  //     .set({ Authorization: `Bearer ${accessToken}` })
+  //     .expect(200);
+  // });
 
-  it('Create [DELETE /api/photos/:id] 400 Bad Request', async () => {
-    await request(app.getHttpServer())
-      .delete(`/api/photos/${'id'}`)
-      .set({ Authorization: `Bearer ${accessToken}` })
-      .expect(400);
-  });
+  // it('Create [DELETE /api/photos/:id] 400 Bad Request', async () => {
+  //   await request(app.getHttpServer())
+  //     .delete(`/api/photos/${'id'}`)
+  //     .set({ Authorization: `Bearer ${accessToken}` })
+  //     .expect(400);
+  // });
 
-  it('Create [DELETE /api/photos/:id] 401 Unauthorization', async () => {
-    await request(app.getHttpServer())
-      .delete(`/api/photos/${photo.id}`)
-      .set({ Authorization: 'Bearer' })
-      .expect(401);
-  });
+  // it('Create [DELETE /api/photos/:id] 401 Unauthorization', async () => {
+  //   await request(app.getHttpServer())
+  //     .delete(`/api/photos/${photo.id}`)
+  //     .set({ Authorization: 'Bearer' })
+  //     .expect(401);
+  // });
 });
 
 //=======================================================================
@@ -492,7 +514,7 @@ describe('E2e test feature Likes', () => {
     await request(app.getHttpServer())
       .delete('/api/likes')
       .set({ Authorization: `Bearer ${accessToken}` })
-      .send({ photoId: photo.id })
+      .send({})
       .expect(400);
   });
 
@@ -505,135 +527,135 @@ describe('E2e test feature Likes', () => {
   });
 
   // Get All Like In A Photo
-  // it('Create [GET /api/likes/allLikeInPhoto/:photoId]', async () => {
-  //   await request(app.getHttpServer())
-  //     .get(`/api/likes/allLikeInPhoto/${photo.id}`)
-  //     .set({ Authorization: `Bearer ${accessToken}` })
-  //     .expect(200);
-  // });
+  it('Create [GET /api/likes/allLikeInPhoto/:photoId]', async () => {
+    await request(app.getHttpServer())
+      .get(`/api/likes/allLikeInPhoto/${photo.id}`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .expect(200);
+  });
 
-  // it('Create [GET /api/likes/allLikeInPhoto/:id] 400 Bad Request', async () => {
-  //   await request(app.getHttpServer())
-  //     .get(`/api/likes/allLikeInPhoto/${'album.id'}`)
-  //     .set({ Authorization: `Bearer ${accessToken}` })
-  //     .expect(400);
-  // });
+  it('Create [GET /api/likes/allLikeInPhoto/:id] 400 Bad Request', async () => {
+    await request(app.getHttpServer())
+      .get(`/api/likes/allLikeInPhoto/${'album.id'}`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .expect(400);
+  });
 
-  // it('Create [GET /api/likes/allLikeInPhoto/:id] 401 Unauthorization', async () => {
-  //   await request(app.getHttpServer())
-  //     .get(`/api/likes/allLikeInPhoto/${photo.id}`)
-  //     .set({ Authorization: 'Bearer' })
-  //     .expect(401);
-  // });
+  it('Create [GET /api/likes/allLikeInPhoto/:id] 401 Unauthorization', async () => {
+    await request(app.getHttpServer())
+      .get(`/api/likes/allLikeInPhoto/${photo.id}`)
+      .set({ Authorization: 'Bearer' })
+      .expect(401);
+  });
   afterAll(() => app.close());
 });
 
-// //=====================================================================
-// // Feature Comments
-// describe('E2e test feature Comments', () => {
-//   // Create Comment
-//   it('Create [POST /api/comments]', async () => {
-//     await request(app.getHttpServer())
-//       .post('/api/comments')
-//       .set({ Authorization: `Bearer ${accessToken}` })
-//       .send({ comment: data_test.comments.comment, photoId: photo.id })
-//       .expect(201);
-//   });
+//=====================================================================
+// Feature Comments
+describe('E2e test feature Comments', () => {
+  // Create Comment
+  it('Create [POST /api/comments]', async () => {
+    await request(app.getHttpServer())
+      .post('/api/comments')
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .send({ comment: data_test.comments.comment, photoId: photo.id })
+      .expect(201);
+  });
 
-//   it('Create [POST /api/comments] 400 Bad Request', async () => {
-//     await request(app.getHttpServer())
-//       .post('/api/comments')
-//       .set({ Authorization: `Bearer ${accessToken}` })
-//       .send(null)
-//       .expect(400);
-//   });
+  it('Create [POST /api/comments] 400 Bad Request', async () => {
+    await request(app.getHttpServer())
+      .post('/api/comments')
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .send(null)
+      .expect(400);
+  });
 
-//   it('Create [POST /api/comments] 401 Unauthorization', async () => {
-//     await request(app.getHttpServer())
-//       .post('/api/comments')
-//       .set({ Authorization: 'Bearer' })
-//       .send({ comment: data_test.comments.comment, photoId: photo.id })
-//       .expect(401);
-//   });
+  it('Create [POST /api/comments] 401 Unauthorization', async () => {
+    await request(app.getHttpServer())
+      .post('/api/comments')
+      .set({ Authorization: 'Bearer' })
+      .send({ comment: data_test.comments.comment, photoId: photo.id })
+      .expect(401);
+  });
 
-//   // Update Comment
-//   it('Create [PATCH /api/comments]', async () => {
-//     await request(app.getHttpServer())
-//       .patch(`/api/comments`)
-//       .set({ Authorization: `Bearer ${accessToken}` })
-//       .send({
-//         updateComment: data_test.commentUpdates.commentUpdate,
-//         photoId: photo.id,
-//       })
-//       .expect(200);
-//   });
+  // Update Comment
+  it('Create [PATCH /api/comments]', async () => {
+    await request(app.getHttpServer())
+      .patch(`/api/comments`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .send({
+        updateComment: data_test.commentUpdates.commentUpdate,
+        photoId: photo.id,
+      })
+      .expect(200);
+  });
 
-//   it('Create [PATCH /api/comments] 400 Bad Request', async () => {
-//     await request(app.getHttpServer())
-//       .patch(`/api/comments`)
-//       .set({ Authorization: `Bearer ${accessToken}` })
-//       .send(null)
-//       .expect(400);
-//   });
+  it('Create [PATCH /api/comments] 400 Bad Request', async () => {
+    await request(app.getHttpServer())
+      .patch(`/api/comments`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .send(null)
+      .expect(400);
+  });
 
-//   it('Create [PATCH /api/comments] 401 Unauthorization', async () => {
-//     await request(app.getHttpServer())
-//       .patch(`/api/comments`)
-//       .set({ Authorization: 'Bearer' })
-//       .send({
-//         updateComment: data_test.commentUpdates.commentUpdate,
-//         photoId: photo.id,
-//       })
-//       .expect(401);
-//   });
+  it('Create [PATCH /api/comments] 401 Unauthorization', async () => {
+    await request(app.getHttpServer())
+      .patch(`/api/comments`)
+      .set({ Authorization: 'Bearer' })
+      .send({
+        updateComment: data_test.commentUpdates.commentUpdate,
+        photoId: photo.id,
+      })
+      .expect(401);
+  });
 
-//   // Get All Comment In A Photo
-//   it('Create [GET /api/comments/allCommentInPhoto/:photoId]', async () => {
-//     await request(app.getHttpServer())
-//       .get(`/api/comments/allCommentInPhoto/${photo.id}`)
-//       .set({ Authorization: `Bearer ${accessToken}` })
-//       .expect(201);
-//   });
+  // Get All Comment In A Photo
+  it('Create [GET /api/comments/allCommentInPhoto/:photoId]', async () => {
+    await request(app.getHttpServer())
+      .get(`/api/comments/allCommentInPhoto/${photo.id}`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .expect(201);
+  });
 
-//   it('Create [GET /api/comments/allCommentInPhoto/:photoId] 400 Bad Request', async () => {
-//     await request(app.getHttpServer())
-//       .get(`/api/comments/allCommentInPhoto/${'photo.id'}`)
-//       .set({ Authorization: `Bearer ${accessToken}` })
-//       .expect(400);
-//   });
+  it('Create [GET /api/comments/allCommentInPhoto/:photoId] 400 Bad Request', async () => {
+    await request(app.getHttpServer())
+      .get(`/api/comments/allCommentInPhoto/${'photo.id'}`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .expect(400);
+  });
 
-//   it('Create [GET /api/comments/allCommentInPhoto/:photoId] 401 Unauthorization', async () => {
-//     await request(app.getHttpServer())
-//       .get(`/api/comments/allCommentInPhoto/${photo.id}`)
-//       .set({ Authorization: 'Bearer' })
-//       .expect(401);
-//   });
+  it('Create [GET /api/comments/allCommentInPhoto/:photoId] 401 Unauthorization', async () => {
+    await request(app.getHttpServer())
+      .get(`/api/comments/allCommentInPhoto/${photo.id}`)
+      .set({ Authorization: 'Bearer' })
+      .expect(401);
+  });
 
-//   // Delete Comment
-//   it('Create [DELETE /api/comments]', async () => {
-//     await request(app.getHttpServer())
-//       .delete(`/api/comments`)
-//       .set({ Authorization: `Bearer ${accessToken}` })
-//       .send({ photoId: photo.id })
-//       .expect(201);
-//   });
+  // Delete Comment
+  it('Create [DELETE /api/comments]', async () => {
+    await request(app.getHttpServer())
+      .delete(`/api/comments`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .send({ photoId: photo.id })
+      .expect(201);
+  });
 
-//   it('Create [DELETE /api/comments] 400 Bad Request', async () => {
-//     await request(app.getHttpServer())
-//       .delete(`/api/comments`)
-//       .set({ Authorization: `Bearer ${accessToken}` })
-//       .send(null)
-//       .expect(400);
-//   });
+  it('Create [DELETE /api/comments] 400 Bad Request', async () => {
+    await request(app.getHttpServer())
+      .delete(`/api/comments`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .send(null)
+      .expect(400);
+  });
 
-//   it('Create [DELETE /api/comments] 401 Unauthorization', async () => {
-//     await request(app.getHttpServer())
-//       .delete(`/api/comments`)
-//       .set({ Authorization: 'Bearer' })
-//       .send({ photoId: photo.id })
-//       .expect(401);
-//   });
-// });
+  it('Create [DELETE /api/comments] 401 Unauthorization', async () => {
+    await request(app.getHttpServer())
+      .delete(`/api/comments`)
+      .set({ Authorization: 'Bearer' })
+      .send({ photoId: photo.id })
+      .expect(401);
+  });
+});
 
 // //===========================================================================
 // // Feature Follows

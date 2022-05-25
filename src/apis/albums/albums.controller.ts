@@ -46,11 +46,15 @@ export class AlbumsController {
     @Res() res,
     @Req() req,
   ) {
-    const data = await this.albumsService.createAlbumService(
-      createAlbumDto,
-      req.user,
-    );
-    res.json({ data });
+    try {
+      const data = await this.albumsService.createAlbumService(
+        createAlbumDto,
+        req.user,
+      );
+      res.json({ data });
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiBearerAuth()
@@ -63,8 +67,12 @@ export class AlbumsController {
     @Res() res,
     @Param() getOneAlbumdto: GetOneAlbumdto,
   ) {
-    const data = await this.albumsService.findOneAlbumService(getOneAlbumdto);
-    res.json({ data });
+    try {
+      const data = await this.albumsService.findOneAlbumService(getOneAlbumdto);
+      res.json({ data });
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiBearerAuth()
@@ -76,8 +84,12 @@ export class AlbumsController {
     @Query() searchPhotodto: SearchAlbumdto,
     @Res() res,
   ) {
-    const data = await this.albumsService.searchByAlbumName(searchPhotodto);
-    res.json({ data });
+    try {
+      const data = await this.albumsService.searchByAlbumName(searchPhotodto);
+      res.json({ data });
+    } catch (error) {
+      throw error;
+    }
   }
 
   // @ApiBearerAuth()
@@ -107,11 +119,15 @@ export class AlbumsController {
     @Param() paramUpdateAlbumdto: ParamUpdateAlbumdto,
     @Res() res,
   ) {
-    const data = await this.albumsService.updateAlbum(
-      updateAlbumDto,
-      paramUpdateAlbumdto,
-    );
-    res.json({ data });
+    try {
+      const data = await this.albumsService.updateAlbum(
+        updateAlbumDto,
+        paramUpdateAlbumdto,
+      );
+      res.json({ data });
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiBearerAuth()
@@ -124,7 +140,11 @@ export class AlbumsController {
     @Res() res,
     @Param() deleteAlbumdto: DeleteAlbumdto,
   ) {
-    const data = await this.albumsService.remove(deleteAlbumdto);
-    res.json({ data });
+    try {
+      const data = await this.albumsService.remove(deleteAlbumdto);
+      res.json({ data });
+    } catch (error) {
+      throw error;
+    }
   }
 }

@@ -35,22 +35,7 @@ export class AlbumsService {
   public async findOneAlbumService(getOneAlbumdto: any) {
     const { id } = getOneAlbumdto;
     try {
-      // const rs = await this.albumsRepository.findOne({
-      //   where: { id },
-      //   relations: ['photos'],
-      // });
-
-      const rs = await this.albumsRepository
-        .createQueryBuilder()
-        .leftJoinAndSelect('Album.photos', 'Photo')
-        .where('Album.id = :id', { id })
-        .getOne();
-
-      // const rs = await this.albumsRepository.query(
-      //   `SELECT * 
-      //   FROM "Album" LEFT JOIN "Photo" ON Album."id"='${id}' Album."id"=Photo."albumId"
-      //   `,
-      // );
+      const rs = await this.albumsRepository.findOne({ where: { id } });
       return rs;
     } catch (error) {
       throw error;

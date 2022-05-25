@@ -26,8 +26,12 @@ export class LikesController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async createLike(@Body() likedto: Likedto, @Res() res, @Req() req) {
-    const data = await this.likesService.createLike(likedto, req.user);
-    res.json({ data });
+    try {
+      const data = await this.likesService.createLike(likedto, req.user);
+      res.json({ data });
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiBearerAuth()
@@ -37,8 +41,12 @@ export class LikesController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async countLike(@Param() countLikedto: CountLikedto, @Res() res) {
-    const data = await this.likesService.countLike(countLikedto);
-    res.json({ data });
+    try {
+      const data = await this.likesService.countLike(countLikedto);
+      res.json({ data });
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiBearerAuth()
@@ -48,9 +56,13 @@ export class LikesController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async unLike(@Body() unLikedto: UnLikedto, @Res() res, @Req() req) {
-    const { id: userId } = req.user;
+    try {
+      const { id: userId } = req.user;
 
-    const data = await this.likesService.unLike(unLikedto, userId);
-    res.json({ data });
+      const data = await this.likesService.unLike(unLikedto, userId);
+      res.json({ data });
+    } catch (error) {
+      throw error;
+    }
   }
 }

@@ -32,6 +32,7 @@ import {
   SearchPhotodto,
   UpdatePhotodto,
   DeleteOnePhotodto,
+  AllPhotoInAlbum,
 } from './photos.dto';
 
 @ApiTags('photos')
@@ -80,9 +81,16 @@ export class PhotosController {
     @Req() req,
   ) {
     const link = path.join('./images', file.filename);
-
-    const data = await this.photosService.createPhoto(photodto, link, req.user);
-    res.json({ data });
+    try {
+      const data = await this.photosService.createPhoto(
+        photodto,
+        link,
+        req.user,
+      );
+      res.json({ data });
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiBearerAuth()
@@ -97,8 +105,12 @@ export class PhotosController {
     @Body() updatePhotodto: UpdatePhotodto,
     @Res() res,
   ) {
-    const data = await this.photosService.updatePhoto(updatePhotodto, id);
-    res.json({ data });
+    try {
+      const data = await this.photosService.updatePhoto(updatePhotodto, id);
+      res.json({ data });
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiBearerAuth()
@@ -112,8 +124,32 @@ export class PhotosController {
     @Req() req,
     @Res() res,
   ) {
-    const data = await this.photosService.getOnePhoto(getOnePhotodto);
-    res.json({ data });
+    try {
+      const data = await this.photosService.getOnePhoto(getOnePhotodto);
+      res.json({ data });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Get('allPhotoInAlbum/:albumId')
+  @ApiResponse({ status: 200, description: 'Ok' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  public async allLikeInPhoto(
+    @Param() allPhotoInAlbum: AllPhotoInAlbum,
+    @Res() res,
+  ) {
+    try {
+      console.log('allPhotoInAlbum:', allPhotoInAlbum);
+
+      const data = await this.photosService.getAllLikeInPhoto(allPhotoInAlbum);
+      res.json({ data });
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiBearerAuth()
@@ -125,9 +161,14 @@ export class PhotosController {
     @Query() searchPhotodto: SearchPhotodto,
     @Res() res,
   ) {
-    const data = await this.photosService.searchByPhotoCaption(searchPhotodto);
-
-    res.json({ data });
+    try {
+      const data = await this.photosService.searchByPhotoCaption(
+        searchPhotodto,
+      );
+      res.json({ data });
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiBearerAuth()
@@ -141,7 +182,11 @@ export class PhotosController {
     @Req() req,
     @Res() res,
   ) {
-    const data = await this.photosService.deleteOnePhoto(deleteOnePhotodto);
-    res.json({ data });
+    try {
+      const data = await this.photosService.deleteOnePhoto(deleteOnePhotodto);
+      res.json({ data });
+    } catch (error) {
+      throw error;
+    }
   }
 }

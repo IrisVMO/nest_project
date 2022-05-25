@@ -26,9 +26,13 @@ export class FollowsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async follow(@Body() followdto: Followdto, @Res() res, @Req() req) {
     const { id: userId } = req.user;
-    const data = await this.followsService.follow(followdto, userId);
+    try {
+      const data = await this.followsService.follow(followdto, userId);
 
-    res.json({ data });
+      res.json({ data });
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiBearerAuth()
@@ -38,8 +42,12 @@ export class FollowsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async newFeed(@Req() req, @Res() res) {
     const { id: userId } = req.user;
-    const data = await this.followsService.newFeed(userId);
-    res.json(data);
+    try {
+      const data = await this.followsService.newFeed(userId);
+      res.json(data);
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiBearerAuth()
@@ -54,9 +62,12 @@ export class FollowsController {
     @Req() req,
   ) {
     const { id: userId } = req.user;
+    try {
+      const data = await this.followsService.unFollow(unFollowdto, userId);
 
-    const data = await this.followsService.unFollow(unFollowdto, userId);
-
-    res.json({ data });
+      res.json({ data });
+    } catch (error) {
+      throw error;
+    }
   }
 }

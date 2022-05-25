@@ -130,7 +130,7 @@ export class UsersService {
     }
   }
 
-  public async remove(deleteOneUser: DeleteOneUser) {
+  public async removeUser(deleteOneUser: DeleteOneUser) {
     try {
       const { id } = deleteOneUser;
       await this.followsService.deletefollow(id);

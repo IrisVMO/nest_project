@@ -16,6 +16,13 @@ export class CreatePhotodto {
   albumId: string;
 }
 
+export class AllPhotoInAlbum {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsUUID()
+  albumId: string;
+}
+
 export class GetOnePhotodto {
   @ApiProperty()
   @IsNotEmpty()

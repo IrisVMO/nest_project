@@ -1,11 +1,21 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import {
+  ExpressAdapter,
+  NestExpressApplication,
+} from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { configs } from './configs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // const app = await NestFactory.create<NestExpressApplication>(
+  //   AppModule,
+  //   new ExpressAdapter(),
+  //   { cors: true },
+  // );
 
   app.useGlobalPipes(new ValidationPipe());
 

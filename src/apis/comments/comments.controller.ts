@@ -33,9 +33,16 @@ export class CommentsController {
     @Res() res,
     @Req() req,
   ) {
-    const data = await this.commentsService.createComment(commentdto, req.user);
+    try {
+      const data = await this.commentsService.createComment(
+        commentdto,
+        req.user,
+      );
 
-    res.json({ data });
+      res.json({ data });
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiBearerAuth()
@@ -48,10 +55,14 @@ export class CommentsController {
     @Param() getAllCommentPhoto: GetAllCommentPhoto,
     @Res() res,
   ) {
-    const data = await this.commentsService.getAllCommentPhoto(
-      getAllCommentPhoto,
-    );
-    res.json({ data });
+    try {
+      const data = await this.commentsService.getAllCommentPhoto(
+        getAllCommentPhoto,
+      );
+      res.json({ data });
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiBearerAuth()
@@ -66,12 +77,16 @@ export class CommentsController {
     @Req() req,
   ) {
     const { id: userId } = req.user;
-    const data = await this.commentsService.updateComment(
-      updateCommentdto,
-      userId,
-    );
+    try {
+      const data = await this.commentsService.updateComment(
+        updateCommentdto,
+        userId,
+      );
 
-    res.json({ data });
+      res.json({ data });
+    } catch (error) {
+      throw error;
+    }
   }
 
   @ApiBearerAuth()
@@ -86,11 +101,15 @@ export class CommentsController {
     @Req() req,
   ) {
     const { id: userId } = req.user;
-    const data = await this.commentsService.deleteComment(
-      deleteCommentdto,
-      userId,
-    );
+    try {
+      const data = await this.commentsService.deleteComment(
+        deleteCommentdto,
+        userId,
+      );
 
-    res.json({ data });
+      res.json({ data });
+    } catch (error) {
+      throw error;
+    }
   }
 }

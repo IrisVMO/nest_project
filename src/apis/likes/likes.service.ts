@@ -19,6 +19,7 @@ export class LikesService {
     let like: Like;
     try {
       const photo = await this.photosService.getOnePhoto({ id });
+
       if (!photo) {
         throw new HttpException(
           "Can't to like the photo",
@@ -59,6 +60,7 @@ export class LikesService {
 
   public async unLike(unLike: UnLikedto, userId: string) {
     const { photoId } = unLike;
+
     try {
       const like = await this.likesRepository.findOne({
         where: { userId, photoId },

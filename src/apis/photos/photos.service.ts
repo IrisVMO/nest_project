@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Like, Repository } from 'typeorm';
 import {
+  AllPhotoInAlbum,
   CreatePhotodto,
   DeleteOnePhotodto,
   GetOnePhotodto,
@@ -39,9 +40,18 @@ export class PhotosService {
     }
   }
 
+  public async getAllLikeInPhoto(allPhotoInAlbum: AllPhotoInAlbum) {
+    const { albumId } = allPhotoInAlbum;
+    try {
+      const rs = await this.photosRepository.find({ where: { albumId } });
+      return rs;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   public async updatePhoto(updatePhotodto: UpdatePhotodto, id: string) {
     const { caption, status } = updatePhotodto;
-
     try {
       const photo = await this.photosRepository.findOne(id);
       if (!photo) {
@@ -76,10 +86,7 @@ export class PhotosService {
   public async getOnePhoto(getOnePhotodto: GetOnePhotodto) {
     const { id } = getOnePhotodto;
     try {
-      const rs = await this.photosRepository.findOne({
-        where: { id },
-        relations: ['likes', 'comments'],
-      });
+      const rs = await this.photosRepository.findOne({ where: { id } });
       return rs;
     } catch (error) {
       throw error;

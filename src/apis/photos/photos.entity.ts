@@ -25,6 +25,9 @@ export class Photo {
   @Column({ generated: 'uuid' })
   userId: string;
 
+  @Column({ generated: 'uuid' })
+  albumId: string;
+
   @Column({ nullable: true })
   caption: string;
 
