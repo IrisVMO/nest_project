@@ -11,6 +11,7 @@ import { Like } from '../likes/likes.entity';
 import { Comment } from '../comments/comments.entity';
 import { Follow } from '../follows/follows.entity';
 import { Photo } from '../photos/photos.entity';
+import { AlbumUser } from '../albums/albums.entity';
 
 export enum Status {
   Active = 'Active',
@@ -64,4 +65,10 @@ export class User {
 
   @OneToMany(() => Photo, (photo) => photo.user)
   photos: Photo[];
+
+  // @ManyToMany(() => Album, (album) => album.users)
+  // albums: Album[];
+
+  @OneToMany(() => AlbumUser, (albumUser) => albumUser.user)
+  albumUsers: AlbumUser[];
 }

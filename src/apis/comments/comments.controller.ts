@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   Res,
   UseGuards,
@@ -17,7 +18,8 @@ import {
   Commentdto,
   UpdateCommentdto,
   DeleteCommentdto,
-  GetAllCommentPhoto,
+  GetAllCommentPhotodto,
+  GetAllCommentPhotoPagedto,
 } from './comments.dto';
 
 @ApiTags('Comments')
@@ -52,12 +54,14 @@ export class CommentsController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async getAllCommentPhoto(
-    @Param() getAllCommentPhoto: GetAllCommentPhoto,
+    @Param() getAllCommentPhoto: GetAllCommentPhotodto,
+    @Query() getAllCommentPhotoPagedto: GetAllCommentPhotoPagedto,
     @Res() res,
   ) {
     try {
       const data = await this.commentsService.getAllCommentPhoto(
         getAllCommentPhoto,
+        getAllCommentPhotoPagedto,
       );
       res.json({ data });
     } catch (error) {

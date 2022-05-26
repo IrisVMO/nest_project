@@ -5,13 +5,19 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Likedto, CountLikedto, UnLikedto } from './likes.dto';
+import {
+  Likedto,
+  CountLikedto,
+  UnLikedto,
+  AllLikeInAPhotoPagedto,
+} from './likes.dto';
 import { LikesService } from './likes.service';
 
 @ApiTags('Likes')
@@ -40,9 +46,16 @@ export class LikesController {
   @ApiResponse({ status: 200, description: 'Ok' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  public async countLike(@Param() countLikedto: CountLikedto, @Res() res) {
+  public async allLikeInPhoto(
+    @Param() countLikedto: CountLikedto,
+    @Query() allLikeInAPhotoPagedto: AllLikeInAPhotoPagedto,
+    @Res() res,
+  ) {
     try {
-      const data = await this.likesService.countLike(countLikedto);
+      const data = await this.likesService.allLikeInPhoto(
+        countLikedto,
+        allLikeInAPhotoPagedto,
+      );
       res.json({ data });
     } catch (error) {
       throw error;

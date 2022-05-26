@@ -25,11 +25,19 @@ export class UpdateCommentdto {
   photoId: string;
 }
 
-export class GetAllCommentPhoto {
+export class GetAllCommentPhotodto {
   @ApiProperty()
   @IsUUID()
   @IsNotEmpty()
   photoId: string;
+}
+
+export class GetAllCommentPhotoPagedto {
+  @ApiProperty({ nullable: true })
+  take: number;
+
+  @ApiProperty({ nullable: true })
+  page: number;
 }
 
 export class DeleteCommentdto {

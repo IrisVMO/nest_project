@@ -42,10 +42,10 @@ export class Photo {
   status: Status;
 
   @CreateDateColumn({ name: 'Created_At', type: 'timestamp' })
-  createdat: Date;
+  createdAt: Date;
 
   @UpdateDateColumn({ name: 'Updated_At', type: 'timestamp' })
-  updatedat: Date;
+  updatedAt: Date;
 
   @ManyToOne(() => Album, (album) => album.photos)
   album: Album;

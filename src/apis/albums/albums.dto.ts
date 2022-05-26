@@ -48,7 +48,7 @@ export class InviteContributedto {
   @ApiProperty()
   @IsNotEmpty()
   @IsUUID()
-  albumId: string;
+  id: string;
 
   @ApiProperty()
   @IsNotEmpty()

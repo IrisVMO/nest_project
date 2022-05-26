@@ -7,7 +7,8 @@ import {
   Commentdto,
   UpdateCommentdto,
   DeleteCommentdto,
-  GetAllCommentPhoto,
+  GetAllCommentPhotodto,
+  GetAllCommentPhotoPagedto,
 } from './comments.dto';
 
 @Injectable()
@@ -35,11 +36,19 @@ export class CommentsService {
     }
   }
 
-  public async getAllCommentPhoto(getAllCommentPhoto: GetAllCommentPhoto) {
-    const { photoId } = getAllCommentPhoto;
+  public async getAllCommentPhoto(
+    getAllCommentPhoto: GetAllCommentPhotodto,
+    getAllCommentPhotoPagedto: GetAllCommentPhotoPagedto,
+  ) {
+    const take = getAllCommentPhotoPagedto.take || 10;
+    const page = getAllCommentPhotoPagedto.page || 1;
+    const skip = (page - 1) * take;
     try {
       const rs = await this.commentsRepository.findAndCount({
-        where: { photoId },
+        where: { photoId: getAllCommentPhoto.photoId },
+        order: { createdAt: 'ASC' },
+        take: take,
+        skip: skip,
       });
       return rs;
     } catch (error) {

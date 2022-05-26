@@ -2,7 +2,12 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Like } from './likes.entity';
-import { CountLikedto, Likedto, UnLikedto } from './likes.dto';
+import {
+  AllLikeInAPhotoPagedto,
+  CountLikedto,
+  Likedto,
+  UnLikedto,
+} from './likes.dto';
 import { PhotosService } from '../photos/photos.service';
 
 @Injectable()
@@ -46,11 +51,18 @@ export class LikesService {
     }
   }
 
-  public async countLike(countLike: CountLikedto) {
-    const { photoId } = countLike;
+  public async allLikeInPhoto(
+    countLike: CountLikedto,
+    allLikeInAPhotoPagedto: AllLikeInAPhotoPagedto,
+  ) {
+    const take = allLikeInAPhotoPagedto.take || 10;
+    const page = allLikeInAPhotoPagedto.page || 1;
+    const skip = (page - 1) * take;
     try {
       const rs = await this.likesRepository.findAndCount({
-        where: { photoId },
+        where: { photoId: countLike.photoId },
+        take: take,
+        skip: skip,
       });
       return rs;
     } catch (error) {

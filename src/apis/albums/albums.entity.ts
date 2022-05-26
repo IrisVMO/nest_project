@@ -5,8 +5,7 @@ import {
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToMany,
-  JoinTable,
+  ManyToOne,
 } from 'typeorm';
 import { Photo } from '../photos/photos.entity';
 import { User } from '../users/users.entity';
@@ -21,22 +20,10 @@ export enum StatusAlbumUser {
   Inactive = 'Inactive',
 }
 
-export enum role {
+export enum Role {
   Owner = 'Owner',
   Contribute = 'Contribute',
 }
-
-// @Entity({ name: 'AlbumUser' })
-// export class AlbumUser {
-//   @PrimaryGeneratedColumn('uuid')
-//   id: string;
-
-//   @Column({ type: 'enum', enum: role, default: 'Owner' })
-//   role: role;
-
-//   @Column({ type: 'enum', enum: StatusAlbumUser, default: 'Active' })
-//   status: StatusAlbumUser;
-// }
 
 @Entity({ name: 'Album' })
 export class Album {
@@ -65,7 +52,30 @@ export class Album {
   @OneToMany(() => Photo, (photo) => photo.album)
   photos: Photo[];
 
-  @ManyToMany(() => User)
-  @JoinTable({ name: 'AlbumUser' })
-  users: User[];
+  @OneToMany(() => AlbumUser, (albumUser) => albumUser.album)
+  albumUsers: AlbumUser[];
+}
+
+@Entity({ name: 'AlbumUser' })
+export class AlbumUser {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ generated: 'uuid' })
+  userId: string;
+
+  @Column({ generated: 'uuid' })
+  albumId: string;
+
+  @Column({ type: 'enum', enum: Role, default: 'Owner' })
+  role: Role;
+
+  @Column({ type: 'enum', enum: StatusAlbumUser, default: 'Active' })
+  status: StatusAlbumUser;
+
+  @ManyToOne(() => Album, (album) => album.albumUsers)
+  album: Album;
+
+  @ManyToOne(() => User, (user) => user.albumUsers)
+  user: User;
 }

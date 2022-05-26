@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, Like, Repository } from 'typeorm';
 import {
   AllPhotoInAlbum,
+  AllPhotoInAlbumPage,
   CreatePhotodto,
   DeleteOnePhotodto,
   GetOnePhotodto,
@@ -40,10 +41,20 @@ export class PhotosService {
     }
   }
 
-  public async getAllLikeInPhoto(allPhotoInAlbum: AllPhotoInAlbum) {
-    const { albumId } = allPhotoInAlbum;
+  public async getAllPhotoInAnAlbum(
+    allPhotoInAlbum: AllPhotoInAlbum,
+    allPhotoInAlbumPage: AllPhotoInAlbumPage,
+  ) {
+    const take = allPhotoInAlbumPage.take || 10;
+    const page = allPhotoInAlbumPage.page || 1;
+    const skip = (page - 1) * take;
     try {
-      const rs = await this.photosRepository.find({ where: { albumId } });
+      const rs = await this.photosRepository.findAndCount({
+        where: { albumId: allPhotoInAlbum.albumId },
+        order: { createdAt: 'ASC' },
+        take: take,
+        skip: skip,
+      });
       return rs;
     } catch (error) {
       throw error;
@@ -75,7 +86,8 @@ export class PhotosService {
     try {
       const rs = await this.photosRepository.find({
         where: { userId: In(following) },
-        order: { createdat: 'DESC' },
+        order: { createdAt: 'DESC' },
+        take: 10,
       });
       return rs;
     } catch (error) {

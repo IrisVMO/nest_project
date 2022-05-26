@@ -23,6 +23,14 @@ export class AllPhotoInAlbum {
   albumId: string;
 }
 
+export class AllPhotoInAlbumPage {
+  @ApiProperty({ nullable: true })
+  take: number;
+
+  @ApiProperty({ nullable: true })
+  page: number;
+}
+
 export class GetOnePhotodto {
   @ApiProperty()
   @IsNotEmpty()

@@ -33,6 +33,7 @@ import {
   UpdatePhotodto,
   DeleteOnePhotodto,
   AllPhotoInAlbum,
+  AllPhotoInAlbumPage,
 } from './photos.dto';
 
 @ApiTags('photos')
@@ -138,12 +139,16 @@ export class PhotosController {
   @ApiResponse({ status: 200, description: 'Ok' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  public async allLikeInPhoto(
+  public async allPhotoInAnAlbum(
     @Param() allPhotoInAlbum: AllPhotoInAlbum,
+    @Query() allPhotoInAlbumPage: AllPhotoInAlbumPage,
     @Res() res,
   ) {
     try {
-      const data = await this.photosService.getAllLikeInPhoto(allPhotoInAlbum);
+      const data = await this.photosService.getAllPhotoInAnAlbum(
+        allPhotoInAlbum,
+        allPhotoInAlbumPage,
+      );
       res.json({ data });
     } catch (error) {
       throw error;

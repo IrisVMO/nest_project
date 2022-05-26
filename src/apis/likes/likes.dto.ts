@@ -16,6 +16,14 @@ export class CountLikedto {
   photoId: string;
 }
 
+export class AllLikeInAPhotoPagedto {
+  @ApiProperty()
+  take: number;
+
+  @ApiProperty()
+  page: number;
+}
+
 export class UnLikedto {
   @ApiProperty()
   @IsUUID()

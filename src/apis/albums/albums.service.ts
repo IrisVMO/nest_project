@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { Like, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Album } from './albums.entity';
+import { UsersService } from '../users/users.service';
+import { Album, AlbumUser, Role, StatusAlbumUser } from './albums.entity';
 import {
   CreateAlbumDto,
   DeleteAlbumdto,
-  // InviteContributedto,
+  InviteContributedto,
   SearchAlbumdto,
   ParamUpdateAlbumdto,
   UpdateAlbumdto,
@@ -16,16 +17,26 @@ export class AlbumsService {
   constructor(
     @InjectRepository(Album)
     private readonly albumsRepository: Repository<Album>,
+    @InjectRepository(AlbumUser)
+    private readonly albumUsersRepository: Repository<AlbumUser>,
   ) {}
+  private readonly usersService: UsersService;
 
   public async createAlbumService(createAlbumDto: CreateAlbumDto, user: any) {
     const album = new Album();
+    const albumUser = new AlbumUser();
     album.name = createAlbumDto.name;
     album.description = createAlbumDto.description;
-    album.users = [user];
     try {
-      const rs = await this.albumsRepository.save(album);
-      return rs;
+      const data = await this.albumsRepository.save(album);
+
+      albumUser.album = data;
+      albumUser.user = user;
+      albumUser.role = Role.Contribute;
+      albumUser.status = StatusAlbumUser.Inactive;
+
+      await this.albumUsersRepository.save(albumUser);
+      return data;
     } catch (error) {
       throw error;
     }
@@ -64,14 +75,18 @@ export class AlbumsService {
     }
   }
 
-  public async inviteContribute() {
-    // const { albumId, userContribueId: userId } = inviteContributedto;
+  public async inviteContribute(inviteContributedto: InviteContributedto) {
+    const { id, userContribueId } = inviteContributedto;
+    const albumUser = new AlbumUser();
     try {
-      // const rs = this.albumsRepository.query(
-      //   `INSERT INTO AlbumUser (albumId, userId, role, status)
-      //   VALUES ('${albumId}', '${userId}', 'Contribute', '${StatusAlbumUser.Inactive}')`,
-      // );
-      return true;
+      const user = await this.usersService.findOneUser({ id: userContribueId });
+      const album = await this.albumsRepository.findOne({ id });
+
+      albumUser.album = album;
+      albumUser.user = user;
+
+      const rs = await this.albumUsersRepository.save(albumUser);
+      return rs;
     } catch (error) {
       throw error;
     }
