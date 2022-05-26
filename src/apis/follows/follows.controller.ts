@@ -61,12 +61,16 @@ export class FollowsController {
     @Res() res,
     @Req() req,
   ) {
+    console.log('unFollowdto:', unFollowdto);
+
     const { id: userId } = req.user;
     try {
       const data = await this.followsService.unFollow(unFollowdto, userId);
 
       res.json({ data });
     } catch (error) {
+      console.log('error:', error);
+
       throw error;
     }
   }

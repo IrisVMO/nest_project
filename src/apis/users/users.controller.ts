@@ -13,14 +13,14 @@ import {
   Patch,
   Inject,
   Query,
-  BadRequestException
+  BadRequestException,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
 import { MailService } from '../../configs/mail/mail.service';
-import { configs } from '../../configs/config';
+// import { configs } from '../../configs/config';
 import { UsersService } from './users.service';
 import {
   CreateUserdto,
@@ -112,27 +112,23 @@ export class UsersController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   public async Login(@Body() loginDto: Logindto, @Res() res) {
     try {
+      const { password } = loginDto;
       const user = await this.usersService.findOneUser(loginDto);
 
       if (!user) {
-        // throw new HttpException(
-        //   'Email or username wrong',
-        //   HttpStatus.BAD_REQUEST,
-        // );
         throw new BadRequestException('Email or username wrong');
       }
 
       if (user.tokenVerify) {
-        throw new HttpException(
+        throw new BadRequestException(
           'Please verify account in your email address',
-          HttpStatus.BAD_REQUEST,
         );
       }
 
-      const result = bcrypt.compareSync(loginDto.password, user.password);
+      const passwordCompare = bcrypt.hashSync(password, user.seed);
 
-      if (!result) {
-        throw new HttpException('Password wrong', HttpStatus.BAD_REQUEST);
+      if (passwordCompare != user.password) {
+        throw new BadRequestException('Password wrong');
       }
 
       const { id, index } = user;
@@ -196,9 +192,9 @@ export class UsersController {
       const user = await this.usersService.findOneUser({ id });
       const { password } = user;
 
-      const result = bcrypt.compareSync(currentPassword, password);
+      const passwordCompare = bcrypt.hashSync(currentPassword, user.seed);
 
-      if (!result) {
+      if (passwordCompare != password) {
         throw new HttpException('Password wrong', HttpStatus.BAD_REQUEST);
       }
 

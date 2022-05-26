@@ -21,6 +21,23 @@ export enum StatusAlbumUser {
   Inactive = 'Inactive',
 }
 
+export enum role {
+  Owner = 'Owner',
+  Contribute = 'Contribute',
+}
+
+// @Entity({ name: 'AlbumUser' })
+// export class AlbumUser {
+//   @PrimaryGeneratedColumn('uuid')
+//   id: string;
+
+//   @Column({ type: 'enum', enum: role, default: 'Owner' })
+//   role: role;
+
+//   @Column({ type: 'enum', enum: StatusAlbumUser, default: 'Active' })
+//   status: StatusAlbumUser;
+// }
+
 @Entity({ name: 'Album' })
 export class Album {
   @PrimaryGeneratedColumn('uuid')
@@ -49,18 +66,6 @@ export class Album {
   photos: Photo[];
 
   @ManyToMany(() => User)
-  @JoinTable({ name: 'Album_User' })
+  @JoinTable({ name: 'AlbumUser' })
   users: User[];
-}
-
-@Entity({ name: 'Album_User' })
-export class AlbumUser {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
-  @Column()
-  role: string;
-
-  @Column({ type: 'enum', enum: StatusAlbumUser, default: 'Active' })
-  status: StatusAlbumUser;
 }

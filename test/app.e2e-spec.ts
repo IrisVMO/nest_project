@@ -10,16 +10,17 @@ import {
 import { AppModule } from '../src/app.module';
 import { CreateAlbumDto, UpdateAlbumdto } from '../src/apis/albums/albums.dto';
 
+const random = Math.floor(Math.random() * 100000000);
 const data_test = {
   user1: {
-    username: '3de2d2ew3e232',
-    email: 'name32e2a2em2222@gmail.com',
+    username: '233fc32',
+    email: 'e322@gmail.com',
     password: '1232456',
   },
 
   userUpdate1: {
-    username: 'nam221s23',
-    email: 'nam12223s4@gmail.com',
+    username: 'na33333',
+    email: 'na3223@gmail.com',
     status: 'Busy',
   },
 
@@ -29,8 +30,8 @@ const data_test = {
   },
 
   user2: {
-    username: '32ded222ew3e232',
-    email: 'name32222ea2em2222@gmail.com',
+    username: `32ded222ew3e232${random}`,
+    email: `${random}2222@gmail.com`,
     password: '1232456',
   },
 
@@ -673,6 +674,8 @@ describe('E2e test feature Follows', () => {
 
   // Unfollow
   it('Create [DELETE /api/follows/:id]', async () => {
+    console.log('user2.id:', user2.id);
+
     await request(app.getHttpServer())
       .delete(`/api/follows/${user2.id}`)
       .set({ Authorization: `Bearer ${accessToken}` })

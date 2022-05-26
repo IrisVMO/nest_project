@@ -2,20 +2,14 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { AllExceptionsFilter } from './configs/all-exeptions.filter';
+import { AllExceptionsFilter } from './configs/exeptions.filter';
 import { configs } from './configs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  // const { httpAdapter } = app.get(HttpAdapterHost);
-  // const app = await NestFactory.create<NestExpressApplication>(
-  //   AppModule,
-  //   new ExpressAdapter(),
-  //   { cors: true },
-  // );
-  // app.setGlobalPrefix('/api');
-  app.useGlobalFilters(new AllExceptionsFilter());
+
   app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalFilters(new AllExceptionsFilter());
 
   const options = new DocumentBuilder()
     .setTitle('API Documentation Manager Social Network')

@@ -77,10 +77,13 @@ export class FollowsService {
   public async unFollow(unFollowdto: UnFollowdto, userId: string) {
     const { userIdFollowing } = unFollowdto;
     try {
+      console.log('userIdFollowing:', userIdFollowing);
+
       const [follower, following] = await Promise.all([
         this.followsRepository.findOne({ where: { userId } }),
         this.followsRepository.findOne({ where: { userId: userIdFollowing } }),
       ]);
+      console.log('follower, following:', follower, following);
 
       follower.userIdFollowing = follower.userIdFollowing.filter(
         (list) => list !== userIdFollowing,
@@ -88,11 +91,14 @@ export class FollowsService {
       following.userIdFollower = follower.userIdFollower.filter(
         (list) => list !== userId,
       );
+      console.log('follower, following:', follower, following);
 
       const rs = await Promise.all([
         this.followsRepository.save(follower),
         this.followsRepository.save(following),
       ]);
+      console.log('rs:', rs);
+
       return rs;
     } catch (error) {
       throw error;

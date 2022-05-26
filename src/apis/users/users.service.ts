@@ -17,9 +17,11 @@ export class UsersService {
   public async create(createUserDto: CreateUserdto) {
     try {
       const user = new User();
+      user.seed = bcrypt.genSaltSync(10);
       user.username = createUserDto.username;
       user.email = createUserDto.email;
-      user.password = bcrypt.hashSync(`${createUserDto.password}`, 10);
+      user.password = bcrypt.hashSync(`${createUserDto.password}`, user.seed);
+
       const rs = await this.usersRepository.save(user);
       await this.followsService.createFollow(rs);
       return rs;
@@ -116,9 +118,11 @@ export class UsersService {
   public async changePasswordService(filter: any) {
     const { id, newPassword, index } = filter;
     try {
-      const password = bcrypt.hashSync(newPassword, 10);
-
       const user = await this.usersRepository.findOne(id);
+
+      user.seed = bcrypt.genSaltSync(10);
+
+      const password = bcrypt.hashSync(newPassword, user.seed);
 
       user.index = index;
       user.password = password;

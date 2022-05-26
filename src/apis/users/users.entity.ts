@@ -26,6 +26,9 @@ export class User {
   username: string;
 
   @Column()
+  seed: string;
+
+  @Column()
   email: string;
 
   @Column()
