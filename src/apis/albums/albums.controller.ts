@@ -12,28 +12,24 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
 import { AlbumsService } from './albums.service';
 import {
   CreateAlbumDto,
   GetOneAlbumdto,
   UpdateAlbumdto,
+  UpdateAlbumParamdto,
   DeleteAlbumdto,
-  ParamUpdateAlbumdto,
   SearchAlbumdto,
   InviteContributedto,
+  AcceptContribueParamdto,
+  AcceptContribueQuerydto,
 } from './albums.dto';
-import { MailService } from '../../configs/mail/mail.service';
 
 @ApiTags('Albums')
 @Controller('api/albums')
 export class AlbumsController {
-  constructor(
-    private readonly albumsService: AlbumsService,
-    private readonly jwtService: JwtService,
-    private readonly mailService: MailService,
-  ) {}
+  constructor(private readonly albumsService: AlbumsService) {}
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
@@ -46,10 +42,11 @@ export class AlbumsController {
     @Res() res,
     @Req() req,
   ) {
+    const { id: userId } = req.user;
     try {
       const data = await this.albumsService.createAlbumService(
         createAlbumDto,
-        req.user,
+        userId,
       );
       res.json({ data });
     } catch (error) {
@@ -66,9 +63,14 @@ export class AlbumsController {
   public async getOneAlbum(
     @Res() res,
     @Param() getOneAlbumdto: GetOneAlbumdto,
+    @Req() req,
   ) {
     try {
-      const data = await this.albumsService.findOneAlbumService(getOneAlbumdto);
+      const { id: userId } = req.user;
+      const data = await this.albumsService.findOneAlbumService(
+        getOneAlbumdto,
+        userId,
+      );
       res.json({ data });
     } catch (error) {
       throw error;
@@ -89,6 +91,28 @@ export class AlbumsController {
       const data = await this.albumsService.inviteContribute(
         inviteContributedto,
       );
+
+      res.json({ data });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @ApiBearerAuth()
+  @Get('acceptContribue/:id')
+  @ApiResponse({ status: 200, description: 'Ok' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  public async reply(
+    @Param() acceptContribueParam: AcceptContribueParamdto,
+    @Query() acceptContribueQuery: AcceptContribueQuerydto,
+    @Res() res,
+  ) {
+    try {
+      const data = await this.albumsService.reply(
+        acceptContribueParam,
+        acceptContribueQuery,
+      );
       res.json({ data });
     } catch (error) {
       throw error;
@@ -103,9 +127,14 @@ export class AlbumsController {
   public async searchPhoto(
     @Query() searchPhotodto: SearchAlbumdto,
     @Res() res,
+    @Req() req,
   ) {
+    const { id: userId } = req.user;
     try {
-      const data = await this.albumsService.searchByAlbumName(searchPhotodto);
+      const data = await this.albumsService.searchByAlbumName(
+        searchPhotodto,
+        userId,
+      );
       res.json({ data });
     } catch (error) {
       throw error;
@@ -120,7 +149,7 @@ export class AlbumsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async updateAlbum(
     @Body() updateAlbumDto: UpdateAlbumdto,
-    @Param() paramUpdateAlbumdto: ParamUpdateAlbumdto,
+    @Param() paramUpdateAlbumdto: UpdateAlbumParamdto,
     @Res() res,
   ) {
     try {

@@ -35,11 +35,9 @@ export class CommentsController {
     @Res() res,
     @Req() req,
   ) {
+    const { id: userId } = req.user;
     try {
-      const data = await this.commentsService.createComment(
-        commentdto,
-        req.user,
-      );
+      const data = await this.commentsService.createComment(commentdto, userId);
 
       res.json({ data });
     } catch (error) {

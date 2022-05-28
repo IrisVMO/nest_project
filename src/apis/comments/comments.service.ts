@@ -10,6 +10,7 @@ import {
   GetAllCommentPhotodto,
   GetAllCommentPhotoPagedto,
 } from './comments.dto';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class CommentsService {
@@ -17,12 +18,14 @@ export class CommentsService {
     @InjectRepository(Comment)
     private readonly commentsRepository: Repository<Comment>,
     private readonly photosService: PhotosService,
+    private readonly usersService: UsersService,
   ) {}
 
-  public async createComment(commentdto: Commentdto, user: any) {
+  public async createComment(commentdto: Commentdto, userId: string) {
     const { comment, photoId: id } = commentdto;
     try {
-      const photo = await this.photosService.getOnePhoto({ id });
+      const user = await this.usersService.findOneUser({ id: userId });
+      const photo = await this.photosService.getOnePhoto({ id }, userId);
 
       const comments = new Comment();
       comments.comment = comment;

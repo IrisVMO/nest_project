@@ -34,6 +34,7 @@ export class CreateUserdto {
 export class VerifyAccountdto {
   @ApiProperty()
   @IsNotEmpty()
+  @IsString()
   tokenVerify: string;
 }
 

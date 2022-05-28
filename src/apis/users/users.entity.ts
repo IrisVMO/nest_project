@@ -5,7 +5,6 @@ import {
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToOne,
 } from 'typeorm';
 import { Like } from '../likes/likes.entity';
 import { Comment } from '../comments/comments.entity';
@@ -54,8 +53,8 @@ export class User {
   @UpdateDateColumn({ name: 'Updated_At', type: 'timestamp' })
   updatedAt: Date;
 
-  @OneToOne(() => Follow, (follow) => follow.user)
-  follow: Follow;
+  @OneToMany(() => Follow, (follow) => follow.user)
+  follows: Follow;
 
   @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];

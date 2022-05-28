@@ -2,7 +2,7 @@ import {
   Column,
   Entity,
   JoinColumn,
-  OneToOne,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../users/users.entity';
@@ -13,21 +13,15 @@ export class Follow {
   id: string;
 
   @Column({ generated: 'uuid' })
+  userIdFollower: string;
+
+  @Column({ generated: 'uuid' })
   userId: string;
 
-  @Column('text', {
-    array: true,
-    default: [],
-  })
-  public userIdFollowing: string[];
+  @Column({ generated: 'uuid' })
+  userIdFollowing: string;
 
-  @Column('text', {
-    array: true,
-    default: [],
-  })
-  public userIdFollower: string[];
-
-  @OneToOne(() => User, (user) => user.follow)
+  @ManyToOne(() => User, (user) => user.follows)
   @JoinColumn()
   user: User;
 }

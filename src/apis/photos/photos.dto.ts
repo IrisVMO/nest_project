@@ -39,13 +39,13 @@ export class GetOnePhotodto {
 }
 
 export class SearchPhotodto {
-  @ApiProperty()
-  filter: string;
+  @ApiProperty({ nullable: true })
+  search: string;
 
-  @ApiProperty()
+  @ApiProperty({ nullable: true })
   take: number;
 
-  @ApiProperty()
+  @ApiProperty({ nullable: true })
   page: number;
 }
 
@@ -56,6 +56,12 @@ export class DeleteOnePhotodto {
   id: string;
 }
 
+export class UpdatePhotodtoParam {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsUUID()
+  id: string;
+}
 export class UpdatePhotodto {
   @ApiProperty()
   @IsNotEmpty()

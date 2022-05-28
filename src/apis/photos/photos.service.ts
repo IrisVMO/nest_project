@@ -1,6 +1,13 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Like, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import {
   AllPhotoInAlbum,
   AllPhotoInAlbumPage,
@@ -9,9 +16,11 @@ import {
   GetOnePhotodto,
   SearchPhotodto,
   UpdatePhotodto,
+  UpdatePhotodtoParam,
 } from './photos.dto';
-import { Photo } from './photos.entity';
 import { AlbumsService } from '../albums/albums.service';
+import { Photo, Status } from './photos.entity';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class PhotosService {
@@ -19,15 +28,23 @@ export class PhotosService {
     @InjectRepository(Photo)
     private readonly photosRepository: Repository<Photo>,
     private readonly albumsService: AlbumsService,
+    @Inject(forwardRef(() => UsersService))
+    private readonly usersService: UsersService,
   ) {}
 
-  public async createPhoto(photodto: CreatePhotodto, link: string, user: any) {
+  public async createPhoto(
+    photodto: CreatePhotodto,
+    link: string,
+    userId: string,
+  ) {
     const { caption, albumId } = photodto;
     try {
+      const user = await this.usersService.findOneUser({ id: userId });
       const photo = new Photo();
-      const album = await this.albumsService.findOneAlbumService({
-        id: albumId,
-      });
+      const album = await this.albumsService.findOneAlbumService(
+        { id: albumId },
+        userId,
+      );
 
       photo.caption = caption;
       photo.link = link;
@@ -61,8 +78,12 @@ export class PhotosService {
     }
   }
 
-  public async updatePhoto(updatePhotodto: UpdatePhotodto, id: string) {
+  public async updatePhoto(
+    updatePhotodto: UpdatePhotodto,
+    updatePhotodtoParam: UpdatePhotodtoParam,
+  ) {
     const { caption, status } = updatePhotodto;
+    const { id } = updatePhotodtoParam;
     try {
       const photo = await this.photosRepository.findOne(id);
       if (!photo) {
@@ -82,46 +103,121 @@ export class PhotosService {
     }
   }
 
-  public async newFeed(following: any) {
-    try {
-      const rs = await this.photosRepository.find({
-        where: { userId: In(following) },
-        order: { createdAt: 'DESC' },
-        take: 10,
-      });
-      return rs;
-    } catch (error) {
-      throw error;
-    }
-  }
+  // public async newFeed(following: any) {
+  //   try {
+  //     const rs = await this.photosRepository.find({
+  //       where: { userId: In(following) },
+  //       order: { createdAt: 'DESC' },
+  //       take: 10,
+  //     });
+  //     return rs;
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
 
-  public async getOnePhoto(getOnePhotodto: GetOnePhotodto) {
+  public async getOnePhoto(getOnePhotodto: GetOnePhotodto, userId: string) {
     const { id } = getOnePhotodto;
     try {
-      const rs = await this.photosRepository.findOne({ where: { id } });
+      const rs = await this.photosRepository
+        .createQueryBuilder('photo')
+        .innerJoin('photo.album', 'album')
+        .innerJoin('album.albumUsers', 'albumUser')
+        .where('photo.id=:id', { id })
+        .andWhere(
+          `(photo.status=:status)
+          OR (albumUser.role=:roleOwner AND albumUser.userId=:userId)
+          OR (albumUser.status=:statusAlbumUserActive AND album.status=:statusAlbumPrivate 
+            AND albumUser.role=:roleContribute AND albumUser.userId=:userId)`,
+          {
+            status: Status.Public,
+            roleOwner: 'Owner',
+            userId,
+            statusAlbumUserActive: 'Active',
+            statusAlbumPrivate: 'Private',
+            roleContribute: 'Contribute',
+          },
+        )
+        .getOne();
+
+      if (!rs) {
+        throw new ForbiddenException('Please join the album');
+      }
       return rs;
     } catch (error) {
       throw error;
     }
   }
 
-  public async searchByPhotoCaption(searchPhotodto: SearchPhotodto) {
+  public async searchByPhotoCaption(
+    searchPhotodto: SearchPhotodto,
+    userId: string,
+  ) {
     const take = searchPhotodto.take || 10;
     const page = searchPhotodto.page || 1;
     const skip = (page - 1) * take;
-    const filter = searchPhotodto.filter || '';
+    const search = searchPhotodto.search || '';
     try {
-      const [result, total] = await this.photosRepository.findAndCount({
-        where: { caption: Like(`%${filter}%`) },
-        order: { caption: 'ASC' },
-        take: take,
-        skip: skip,
-      });
+      const rs = await this.photosRepository
+        .createQueryBuilder('photo')
+        .select('photo')
+        .innerJoin('photo.album', 'album')
+        .innerJoin('album.albumUsers', 'albumUser')
+        .where('photo.caption ILIKE :caption', { caption: `%${search}%` })
+        .andWhere(
+          `(photo.status=:status)
+          OR (albumUser.role=:roleOwner AND albumUser.userId=:userId)
+          OR (albumUser.status=:statusAlbumUserActive AND album.status=:statusAlbumPrivate 
+            AND albumUser.role=:roleContribute AND albumUser.userId=:userId)`,
+          {
+            status: Status.Public,
+            roleOwner: 'Owner',
+            userId,
+            statusAlbumUserActive: 'Active',
+            statusAlbumPrivate: 'Private',
+            roleContribute: 'Contribute',
+          },
+        )
+        .orderBy('photo.caption', 'ASC')
+        .skip(skip)
+        .take(take)
+        .getManyAndCount();
 
-      return {
-        data: result,
-        count: total,
-      };
+      return rs;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async newFeed(userId: string) {
+    const take = 10;
+    try {
+      const rs = await this.photosRepository
+        .createQueryBuilder('photo')
+        .innerJoin('photo.user', 'user')
+        .innerJoin('user.follows', 'follow')
+        .innerJoin('photo.album', 'album')
+        .innerJoin('album.albumUsers', 'albumUser')
+        .where('follow.userIdFollower=:userId', { userId })
+        .andWhere(
+          `(photo.status=:status)
+          OR (albumUser.role=:roleOwner AND albumUser.userId=:userId)
+          OR (albumUser.status=:statusAlbumUserActive AND album.status=:statusAlbumPrivate 
+            AND albumUser.role=:roleContribute AND albumUser.userId=:userId)`,
+          {
+            status: Status.Public,
+            roleOwner: 'Owner',
+            userId,
+            statusAlbumUserActive: 'Active',
+            statusAlbumPrivate: 'Private',
+            roleContribute: 'Contribute',
+          },
+        )
+        .orderBy('photo.createdAt', 'DESC')
+        .take(take)
+        .getMany();
+
+      return rs;
     } catch (error) {
       throw error;
     }

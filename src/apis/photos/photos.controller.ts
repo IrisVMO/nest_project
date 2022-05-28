@@ -34,6 +34,7 @@ import {
   DeleteOnePhotodto,
   AllPhotoInAlbum,
   AllPhotoInAlbumPage,
+  UpdatePhotodtoParam,
 } from './photos.dto';
 
 @ApiTags('photos')
@@ -82,12 +83,9 @@ export class PhotosController {
     @Req() req,
   ) {
     const link = path.join('./images', file.filename);
+    const { id: userId } = req.user;
     try {
-      const data = await this.photosService.createPhoto(
-        photodto,
-        link,
-        req.user,
-      );
+      const data = await this.photosService.createPhoto(photodto, link, userId);
       res.json({ data });
     } catch (error) {
       throw error;
@@ -102,12 +100,15 @@ export class PhotosController {
   @ApiResponse({ status: 404, description: 'Not found' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async updatePhoto(
-    @Param() id: string,
+    @Param() updatePhotodtoParam: UpdatePhotodtoParam,
     @Body() updatePhotodto: UpdatePhotodto,
     @Res() res,
   ) {
     try {
-      const data = await this.photosService.updatePhoto(updatePhotodto, id);
+      const data = await this.photosService.updatePhoto(
+        updatePhotodto,
+        updatePhotodtoParam,
+      );
       res.json({ data });
     } catch (error) {
       throw error;
@@ -125,8 +126,9 @@ export class PhotosController {
     @Req() req,
     @Res() res,
   ) {
+    const { id: userId } = req.user;
     try {
-      const data = await this.photosService.getOnePhoto(getOnePhotodto);
+      const data = await this.photosService.getOnePhoto(getOnePhotodto, userId);
       res.json({ data });
     } catch (error) {
       throw error;
@@ -163,11 +165,29 @@ export class PhotosController {
   public async searchPhoto(
     @Query() searchPhotodto: SearchPhotodto,
     @Res() res,
+    @Req() req,
   ) {
+    const { id: userId } = req.user;
     try {
       const data = await this.photosService.searchByPhotoCaption(
         searchPhotodto,
+        userId,
       );
+      res.json({ data });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Get('newFeed')
+  @ApiResponse({ status: 200, description: 'Ok' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  public async newFeed(@Res() res, @Req() req) {
+    const { id: userId } = req.user;
+    try {
+      const data = await this.photosService.newFeed(userId);
       res.json({ data });
     } catch (error) {
       throw error;

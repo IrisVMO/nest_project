@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PhotosService } from '../photos/photos.service';
@@ -13,12 +13,43 @@ export class FollowsService {
     private readonly photosService: PhotosService,
   ) {}
 
-  public async createFollow(user: any) {
-    try {
-      const follow = new Follow();
-      follow.user = user;
+  public async follow(followdto: Followdto, user: any) {
+    const { userIdFollowing } = followdto;
+    const { id: userId } = user;
+    console.log('Service userIdFollowing:', userIdFollowing);
 
-      const rs = await this.followsRepository.save(follow);
+    try {
+      const IsAvailableFollow = await this.followsRepository.findOne({
+        where: { userIdFollowing, userId },
+      });
+
+      if (IsAvailableFollow) {
+        throw new BadRequestException('You followed this person');
+      } else {
+        const follow = new Follow();
+        follow.userIdFollower = user.id;
+        follow.userIdFollowing = userIdFollowing;
+        follow.user = user;
+        console.log('service follow:', follow);
+
+        const rs = await this.followsRepository.save(follow);
+        console.log('service rs:', rs);
+
+        return rs;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async unFollow(unFollowdto: UnFollowdto, userId: string) {
+    const { userIdFollowing } = unFollowdto;
+    try {
+      const follow = await this.followsRepository.findOne({
+        where: { userIdFollowing, userIdFollower: userId },
+      });
+
+      const rs = await this.followsRepository.remove(follow);
       return rs;
     } catch (error) {
       throw error;
@@ -32,73 +63,6 @@ export class FollowsService {
       });
 
       const rs = await this.followsRepository.remove(followTable);
-      return rs;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  public async follow(followdto: Followdto, userId: string) {
-    try {
-      const { userIdFollowing } = followdto;
-
-      const [follower, following] = await Promise.all([
-        this.followsRepository.findOne({ where: { userId } }),
-        this.followsRepository.findOne({ where: { userId: userIdFollowing } }),
-      ]);
-
-      follower.userIdFollowing.push(userIdFollowing);
-      following.userIdFollower.push(userId);
-
-      const rs = await Promise.all([
-        this.followsRepository.save(follower),
-        this.followsRepository.save(following),
-      ]);
-      return rs;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  public async newFeed(userId: string) {
-    try {
-      const follow = await this.followsRepository.findOne({
-        where: { userId },
-      });
-      const following = follow.userIdFollowing.concat(userId);
-
-      const rs = await this.photosService.newFeed(following);
-      return rs;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  public async unFollow(unFollowdto: UnFollowdto, userId: string) {
-    const { userIdFollowing } = unFollowdto;
-    try {
-      console.log('userIdFollowing:', userIdFollowing);
-
-      const [follower, following] = await Promise.all([
-        this.followsRepository.findOne({ where: { userId } }),
-        this.followsRepository.findOne({ where: { userId: userIdFollowing } }),
-      ]);
-      console.log('follower, following:', follower, following);
-
-      follower.userIdFollowing = follower.userIdFollowing.filter(
-        (list) => list !== userIdFollowing,
-      );
-      following.userIdFollower = follower.userIdFollower.filter(
-        (list) => list !== userId,
-      );
-      console.log('follower, following:', follower, following);
-
-      const rs = await Promise.all([
-        this.followsRepository.save(follower),
-        this.followsRepository.save(following),
-      ]);
-      console.log('rs:', rs);
-
       return rs;
     } catch (error) {
       throw error;

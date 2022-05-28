@@ -9,6 +9,7 @@ import {
   UnLikedto,
 } from './likes.dto';
 import { PhotosService } from '../photos/photos.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class LikesService {
@@ -16,14 +17,15 @@ export class LikesService {
     @InjectRepository(Like)
     private readonly likesRepository: Repository<Like>,
     private readonly photosService: PhotosService,
+    private readonly usersService: UsersService,
   ) {}
 
-  public async createLike(likedto: Likedto, user: any) {
+  public async createLike(likedto: Likedto, userId: string) {
     const { photoId: id } = likedto;
-    const { id: userId } = user;
     let like: Like;
     try {
-      const photo = await this.photosService.getOnePhoto({ id });
+      const user = await this.usersService.findOneUser({ id: userId });
+      const photo = await this.photosService.getOnePhoto({ id }, userId);
 
       if (!photo) {
         throw new HttpException(

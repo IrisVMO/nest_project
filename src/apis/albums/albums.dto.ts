@@ -6,6 +6,11 @@ export enum Status {
   Private = 'Private',
 }
 
+export enum StatusAlbumUser {
+  Active = 'Active',
+  Inactive = 'Inactive',
+}
+
 export class CreateAlbumDto {
   @ApiProperty({ example: 'Seas' })
   @IsNotEmpty()
@@ -35,12 +40,12 @@ export class GetAllPhotoInAlbumdto {
 
 export class SearchAlbumdto {
   @ApiProperty({ example: 'Seas', nullable: true })
-  filter: string;
+  name: string;
 
-  @ApiProperty()
+  @ApiProperty({ nullable: true })
   take: number;
 
-  @ApiProperty()
+  @ApiProperty({ nullable: true })
   page: number;
 }
 
@@ -69,11 +74,30 @@ export class UpdateAlbumdto {
   status: Status;
 }
 
-export class ParamUpdateAlbumdto {
+export class UpdateAlbumParamdto {
   @ApiProperty()
   @IsUUID()
   @IsNotEmpty()
   id: string;
+}
+
+export class AcceptContribueParamdto {
+  @ApiProperty()
+  @IsUUID()
+  @IsNotEmpty()
+  id: string;
+}
+
+export class AcceptContribueQuerydto {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  tokenReply: string;
+
+  @ApiProperty({ enum: StatusAlbumUser })
+  @IsNotEmpty()
+  @IsString()
+  status: StatusAlbumUser;
 }
 
 export class DeleteAlbumdto {

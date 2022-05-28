@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
   Post,
   Req,
   Res,
@@ -25,26 +24,12 @@ export class FollowsController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async follow(@Body() followdto: Followdto, @Res() res, @Req() req) {
-    const { id: userId } = req.user;
     try {
-      const data = await this.followsService.follow(followdto, userId);
+      console.log('controller:', followdto, req.user);
+
+      const data = await this.followsService.follow(followdto, req.user);
 
       res.json({ data });
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
-  @Get('newFeed')
-  @ApiResponse({ status: 200, description: 'Ok' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  public async newFeed(@Req() req, @Res() res) {
-    const { id: userId } = req.user;
-    try {
-      const data = await this.followsService.newFeed(userId);
-      res.json(data);
     } catch (error) {
       throw error;
     }

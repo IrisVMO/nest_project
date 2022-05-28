@@ -419,6 +419,21 @@ describe('E2e test feature Photos', () => {
       .expect(401);
   });
 
+  // New Feed
+  it('Create [GET /api/photos/newFeed]', async () => {
+    await request(app.getHttpServer())
+      .get(`/api/photos/newFeed`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .expect(200);
+  });
+
+  it('Create [GET /api/photos/newFeed] 401 Unauthorization', async () => {
+    await request(app.getHttpServer())
+      .get(`/api/photos/newFeed`)
+      .set({ Authorization: 'Bearer' })
+      .expect(401);
+  });
+
   // Update Photo
   it('Create [PATCH /api/photos/:id]', async () => {
     request(app.getHttpServer())
@@ -654,21 +669,6 @@ describe('E2e test feature Follows', () => {
       .post('/api/follows')
       .set({ Authorization: 'Bearer' })
       .send({ userIdFollowing: user2.id })
-      .expect(401);
-  });
-
-  // New Feed
-  it('Create [GET /api/follows/newFeed]', async () => {
-    await request(app.getHttpServer())
-      .get(`/api/follows/newFeed`)
-      .set({ Authorization: `Bearer ${accessToken}` })
-      .expect(200);
-  });
-
-  it('Create [GET /api/follows/newFeed] 401 Unauthorization', async () => {
-    await request(app.getHttpServer())
-      .get(`/api/follows/newFeed`)
-      .set({ Authorization: 'Bearer' })
       .expect(401);
   });
 

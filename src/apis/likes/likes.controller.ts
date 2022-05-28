@@ -32,8 +32,9 @@ export class LikesController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async createLike(@Body() likedto: Likedto, @Res() res, @Req() req) {
+    const { id: userId } = req.user;
     try {
-      const data = await this.likesService.createLike(likedto, req.user);
+      const data = await this.likesService.createLike(likedto, userId);
       res.json({ data });
     } catch (error) {
       throw error;
