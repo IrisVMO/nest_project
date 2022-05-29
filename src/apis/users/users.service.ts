@@ -2,25 +2,24 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { FollowsService } from '../follows/follows.service';
 import { User } from './users.entity';
-import { CreateUserdto, DeleteOneUser, GetAllUserdto } from './users.dto';
+import { DeleteOneUser, GetAllUserdto } from './users.dto';
+import { Registerdto } from '../auth/auth.dto';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
-    private readonly followsService: FollowsService,
   ) {}
 
-  public async create(createUserDto: CreateUserdto) {
+  public async createUser(Registerdto: Registerdto) {
     try {
       const user = new User();
       user.seed = bcrypt.genSaltSync(10);
-      user.username = createUserDto.username;
-      user.email = createUserDto.email;
-      user.password = bcrypt.hashSync(`${createUserDto.password}`, user.seed);
+      user.username = Registerdto.username;
+      user.email = Registerdto.email;
+      user.password = bcrypt.hashSync(`${Registerdto.password}`, user.seed);
 
       const rs = await this.usersRepository.save(user);
       return rs;
@@ -86,16 +85,6 @@ export class UsersService {
     }
   }
 
-  public async findAuth(filter: any) {
-    const { id, index } = filter;
-    try {
-      const rs = await this.usersRepository.findOne({ where: { id, index } });
-      return rs;
-    } catch (error) {
-      throw error;
-    }
-  }
-
   public async updateInforService(updateUserField: any) {
     const { id, username, tokenVerify, email } = updateUserField;
     try {
@@ -112,7 +101,7 @@ export class UsersService {
   }
 
   public async changePasswordService(filter: any) {
-    const { id, newPassword, index } = filter;
+    const { id, newPassword } = filter;
     try {
       const user = await this.usersRepository.findOne(id);
 
@@ -120,7 +109,6 @@ export class UsersService {
 
       const password = bcrypt.hashSync(newPassword, user.seed);
 
-      user.index = index;
       user.password = password;
 
       const rs = await this.usersRepository.save(user);
@@ -133,7 +121,6 @@ export class UsersService {
   public async removeUser(deleteOneUser: DeleteOneUser) {
     try {
       const { id } = deleteOneUser;
-      await this.followsService.deletefollow(id);
 
       const rs = await this.usersRepository.delete(id);
       return rs;

@@ -1,14 +1,10 @@
 import { Test } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
-import {
-  ChangePassworddto,
-  CreateUserdto,
-  Logindto,
-  UpdateInfordto,
-} from '../src/apis/users/users.dto';
+import { ChangePassworddto, UpdateInfordto } from '../src/apis/users/users.dto';
 import { AppModule } from '../src/app.module';
 import { CreateAlbumDto, UpdateAlbumdto } from '../src/apis/albums/albums.dto';
+import { Logindto, Registerdto } from '../src/apis/auth/auth.dto';
 
 const random = Math.floor(Math.random() * 100000000);
 const data_test = {
@@ -72,8 +68,7 @@ let accessToken: string,
   user2: any,
   comment: any;
 
-// Feature Users
-describe('E2e test feature Users', () => {
+describe('E2e test feature Auth', () => {
   beforeAll(async () => {
     const moduleFixture = await Test.createTestingModule({
       imports: [AppModule],
@@ -86,159 +81,54 @@ describe('E2e test feature Users', () => {
   });
 
   // Signup
-  it('Create [POST /api/users/signup]', async () => {
-    await request(app.getHttpServer())
-      .post('/api/users/signup')
-      .send(data_test.user1 as CreateUserdto)
+  it('Create [POST /api/auth/register]', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/api/auth/register')
+      .send(data_test.user1 as Registerdto)
       .expect(201);
+
+    user1 = response.body.data;
+    console.log('user1:', user1);
   });
 
-  it('Create [POST /api/users/signup] Conflic', async () => {
+  it('Create [POST /api/auth/register] Conflic', async () => {
     await request(app.getHttpServer())
-      .post('/api/users/signup')
-      .send(data_test.user1 as CreateUserdto)
+      .post('/api/auth/register')
+      .send(data_test.user1 as Registerdto)
       .expect(409);
   });
 
-  it('Create [POST /api/users/signup] 400 Bad Request', async () => {
+  it('Create [POST /api/auth/register] 400 Bad Request', async () => {
     await request(app.getHttpServer())
-      .post('/api/users/signup')
-      // .send({} as CreateUserdto)
+      .post('/api/auth/register')
+      .send(null)
       .expect(400);
   });
 
-  it('Create [POST /api/users/signup]', async () => {
+  it('Create [POST /api/auth/register]', async () => {
     const response = await request(app.getHttpServer())
-      .post('/api/users/signup')
-      .send(data_test.user2 as CreateUserdto)
+      .post('/api/auth/register')
+      .send(data_test.user2 as Registerdto)
       .expect(201);
 
     user2 = response.body.data;
   });
 
   // Login
-  it('Create [POST /api/users/login]', async () => {
+  it('Create [POST /api/auth/login]', async () => {
     const response = await request(app.getHttpServer())
-      .post('/api/users/login')
+      .post('/api/auth/login')
       .send(data_test.user1 as Logindto)
       .expect(201);
 
-    user1 = response.body.data;
     accessToken = response.body.accessToken;
   });
 
-  it('Create [POST /api/users/login] 400 Bad Request', async () => {
+  it('Create [POST /api/auth/login] 400 Bad Request', async () => {
     await request(app.getHttpServer())
-      .post('/api/users/login')
+      .post('/api/auth/login')
       .send(null)
       .expect(400);
-  });
-
-  // Update Infor
-  it('Create [PATCH /api/users]', async () => {
-    await request(app.getHttpServer())
-      .patch(`/api/users`)
-      .set({ Authorization: `Bearer ${accessToken}` })
-      .send(data_test.userUpdate1 as UpdateInfordto)
-      .expect(200);
-  });
-
-  // it('Create [PATCH /api/users] 400 Bad Request', async () => {
-  //   await request(app.getHttpServer())
-  //     .patch(`/api/users`)
-  //     .set({ Authorization: `Bearer ${accessToken}` })
-  //     .send({})
-  //     .expect(400);
-  // });
-
-  it('Create [PATCH /api/users]', async () => {
-    await request(app.getHttpServer())
-      .patch(`/api/users`)
-      .set({ Authorization: 'Bearer' })
-      .send(data_test.userUpdate1 as UpdateInfordto)
-      .expect(401);
-  });
-
-  // Get One User
-  it('Create [GET /api/users/one/:id]', async () => {
-    await request(app.getHttpServer())
-      .get(`/api/users/one/${user1.id}`)
-      .set({ Authorization: `Bearer ${accessToken}` })
-      .expect(200);
-  });
-
-  it('Create [GET /api/users/one  /:id] 400 Bad Request', async () => {
-    await request(app.getHttpServer())
-      .get(`/api/users/one/${'id'}`)
-      .set({ Authorization: `Bearer ${accessToken}` })
-      .expect(400);
-  });
-
-  it('Create [GET /api/users/one/:id] 401 Unauthorization', async () => {
-    await request(app.getHttpServer())
-      .get(`/api/users/one/${user1.id}`)
-      .set({ Authorization: 'Bearer' })
-      .expect(401);
-  });
-
-  it('Create [GET /api/users/one/:id] Not Found', async () => {
-    await request(app.getHttpServer())
-      .get('/api/users/one/9e08af9d-ffa6-5000-a2a7-9a29066793e9')
-      .set({ Authorization: `Bearer ${accessToken}` })
-      .expect(404);
-  });
-
-  // Search, filter user by username
-  it('Create [GET /api/users]', async () => {
-    await request(app.getHttpServer())
-      .get(`/api/users?filter=a&take=10&page=1`)
-      .set({ Authorization: `Bearer ${accessToken}` })
-      .expect(200);
-  });
-
-  it('Create [GET /api/users/search/:username] 401 Unauthorization', async () => {
-    await request(app.getHttpServer())
-      .get(`/api/users?filter=a&take=10&page=1`)
-      .set({ Authorization: `Bearer` })
-      .expect(401);
-  });
-
-  // Change Password
-  it('Create [PATCH /api/users/changePassword] 400 Bad Request', async () => {
-    await request(app.getHttpServer())
-      .patch('/api/users/changePassword')
-      .set({ Authorization: `Bearer ${accessToken}` })
-      .send({})
-      .expect(400);
-  });
-
-  it('Create [PATCH /api/users/changePassword] 401 Unauthorization', async () => {
-    await request(app.getHttpServer())
-      .patch('/api/users/changePassword')
-      .set({ Authorization: 'Bearer' })
-      .send(data_test.userChangePassword1 as ChangePassworddto)
-      .expect(401);
-  });
-
-  it('Create [PATCH /api/users/changePassword]', async () => {
-    await request(app.getHttpServer())
-      .patch('/api/users/changePassword')
-      .set({ Authorization: `Bearer ${accessToken}` })
-      .send(data_test.userChangePassword1 as ChangePassworddto)
-      .expect(200);
-  });
-
-  it('Create [POST /api/users/login]', async () => {
-    const response = await request(app.getHttpServer())
-      .post('/api/users/login')
-      .send({
-        username: data_test.userUpdate1.username,
-        password: data_test.userChangePassword1.newPassword,
-      })
-      .expect(201);
-
-    user1 = response.body.data;
-    accessToken = response.body.accessToken;
   });
 });
 
@@ -745,11 +635,104 @@ describe('E2e test feature Albums', () => {
   });
 });
 
-//=========================================================================
+// ============================================================
 // Feature Users
 describe('E2e test feature Users', () => {
-  // Delete User
+  // Update Infor
+  it('Create [PATCH /api/users]', async () => {
+    await request(app.getHttpServer())
+      .patch(`/api/users`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .send(data_test.userUpdate1 as UpdateInfordto)
+      .expect(200);
+  });
 
+  // it('Create [PATCH /api/users] 400 Bad Request', async () => {
+  //   await request(app.getHttpServer())
+  //     .patch(`/api/users`)
+  //     .set({ Authorization: `Bearer ${accessToken}` })
+  //     .send({})
+  //     .expect(400);
+  // });
+
+  it('Create [PATCH /api/users]', async () => {
+    await request(app.getHttpServer())
+      .patch(`/api/users`)
+      .set({ Authorization: 'Bearer' })
+      .send(data_test.userUpdate1 as UpdateInfordto)
+      .expect(401);
+  });
+
+  // Get One User
+  it('Create [GET /api/users/one/:id]', async () => {
+    await request(app.getHttpServer())
+      .get(`/api/users/one/${user1.id}`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .expect(200);
+  });
+
+  it('Create [GET /api/users/one  /:id] 400 Bad Request', async () => {
+    await request(app.getHttpServer())
+      .get(`/api/users/one/${'id'}`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .expect(400);
+  });
+
+  it('Create [GET /api/users/one/:id] 401 Unauthorization', async () => {
+    await request(app.getHttpServer())
+      .get(`/api/users/one/${user1.id}`)
+      .set({ Authorization: 'Bearer' })
+      .expect(401);
+  });
+
+  it('Create [GET /api/users/one/:id] Not Found', async () => {
+    await request(app.getHttpServer())
+      .get('/api/users/one/9e08af9d-ffa6-5000-a2a7-9a29066793e9')
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .expect(404);
+  });
+
+  // Search, filter user by username
+  it('Create [GET /api/users]', async () => {
+    await request(app.getHttpServer())
+      .get(`/api/users?filter=a&take=10&page=1`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .expect(200);
+  });
+
+  it('Create [GET /api/users/search/:username] 401 Unauthorization', async () => {
+    await request(app.getHttpServer())
+      .get(`/api/users?filter=a&take=10&page=1`)
+      .set({ Authorization: `Bearer` })
+      .expect(401);
+  });
+
+  // Change Password
+  it('Create [PATCH /api/users/changePassword] 400 Bad Request', async () => {
+    await request(app.getHttpServer())
+      .patch('/api/users/changePassword')
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .send({})
+      .expect(400);
+  });
+
+  it('Create [PATCH /api/users/changePassword] 401 Unauthorization', async () => {
+    await request(app.getHttpServer())
+      .patch('/api/users/changePassword')
+      .set({ Authorization: 'Bearer' })
+      .send(data_test.userChangePassword1 as ChangePassworddto)
+      .expect(401);
+  });
+
+  it('Create [PATCH /api/users/changePassword]', async () => {
+    await request(app.getHttpServer())
+      .patch('/api/users/changePassword')
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .send(data_test.userChangePassword1 as ChangePassworddto)
+      .expect(200);
+  });
+
+  // Delete User
   it('Create [Delete /api/users/:id] 400 Bad request', async () => {
     await request(app.getHttpServer())
       .delete(`/api/users/random`)

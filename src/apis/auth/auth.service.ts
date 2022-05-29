@@ -1,142 +1,111 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
+import {
+  BadRequestException,
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { FollowsService } from '../follows/follows.service';
-import { User } from './users.entity';
-import { CreateUserdto, DeleteOneUser, GetAllUserdto } from './users.dto';
+import { configs } from '../../configs/config';
+import { MailService } from '../../configs/mail/mail.service';
+import { UsersService } from '../users/users.service';
+import { Registerdto, Logindto, VerifyAccountdto } from './auth.dto';
 
 @Injectable()
-export class UsersService {
+export class AuthService {
   constructor(
-    @InjectRepository(User)
-    private readonly usersRepository: Repository<User>,
-    private readonly followsService: FollowsService,
+    @Inject(forwardRef(() => UsersService))
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
   ) {}
 
-  public async create(createUserDto: CreateUserdto) {
+  public async register(registerdto: Registerdto) {
     try {
-      const user = new User();
-      user.seed = bcrypt.genSaltSync(10);
-      user.username = createUserDto.username;
-      user.email = createUserDto.email;
-      user.password = bcrypt.hashSync(`${createUserDto.password}`, user.seed);
+      const isExistEmail = await this.usersService.findOneUser({
+        email: registerdto.email,
+      });
 
-      const rs = await this.usersRepository.save(user);
-      return rs;
+      if (isExistEmail) {
+        throw new HttpException('Email already exists', HttpStatus.CONFLICT);
+      }
+
+      const isExistUsername = await this.usersService.findOneUser({
+        username: registerdto.username,
+      });
+
+      if (isExistUsername) {
+        throw new HttpException('Username already exists', HttpStatus.CONFLICT);
+      }
+
+      const user = await this.usersService.createUser(registerdto);
+      const { id } = user;
+
+      if (process.env.NODE_ENV != 'test') {
+        const tokenVerify = this.jwtService.sign({ id });
+        const option = {
+          from: configs.emailHelper,
+          to: user.email,
+          subject: 'Wellcom to UNIVERSE PHOTOS',
+          html: `<p>
+              Please verify your account
+              <a href='http://${configs.host}:${configs.port}/api/auth/verify/${tokenVerify}'>Verify Account</a>
+            </p>`,
+        };
+
+        await this.usersService.updateInforService({ tokenVerify, id });
+        this.mailService.sendMail(option);
+      }
+      return user;
     } catch (error) {
       throw error;
     }
   }
 
-  public async verifyAccount(id: string) {
+  public async verifyAccount(verifyAccountdto: VerifyAccountdto) {
+    const { tokenVerify } = verifyAccountdto;
     try {
-      const user = await this.usersRepository.findOne(id);
+      const decode = this.jwtService.verify(tokenVerify);
+      const user = await this.usersService.findOneUser({ id: decode.id });
 
       if (!user) {
         throw new BadRequestException('Invalid verify your account');
       }
 
-      user.tokenVerify = null;
-
-      const rs = await this.usersRepository.save(user);
+      const rs = await this.usersService.updateInforService({
+        tokenVerify: null,
+        id: user.id,
+      });
       return rs;
     } catch (error) {
       throw error;
     }
   }
 
-  public async findAllUser(getAllUserdto: GetAllUserdto) {
-    const take = getAllUserdto.take || 10;
-    const page = getAllUserdto.page || 1;
-    const skip = (page - 1) * take;
-    const filter = getAllUserdto.filter || '';
-
+  public async login(logindto: Logindto) {
     try {
-      const [result, total] = await this.usersRepository.findAndCount({
-        where: { username: ILike(`%${filter}%`) },
-        order: { username: 'ASC' },
-        take: take,
-        skip: skip,
-      });
+      const { password } = logindto;
+      const user = await this.usersService.findOneUser(logindto);
 
-      return {
-        data: result,
-        count: total,
-      };
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  public async findOneUser(filter: any) {
-    const { id, username, email } = filter;
-    try {
-      if (!id) {
-        const rs = await this.usersRepository.findOne({
-          where: [{ email }, { username }],
-        });
-        return rs;
+      if (!user) {
+        throw new BadRequestException('Email or username wrong');
       }
 
-      const rs = await this.usersRepository.findOne(id);
-      return rs;
-    } catch (error) {
-      throw error;
-    }
-  }
+      if (user.tokenVerify) {
+        throw new BadRequestException('Please verify your account');
+      }
 
-  public async findAuth(filter: any) {
-    const { id, index } = filter;
-    try {
-      const rs = await this.usersRepository.findOne({ where: { id, index } });
-      return rs;
-    } catch (error) {
-      throw error;
-    }
-  }
+      const passwordCompare = bcrypt.hashSync(password, user.seed);
 
-  public async updateInforService(updateUserField: any) {
-    const { id, username, tokenVerify, email } = updateUserField;
-    try {
-      const user = await this.usersRepository.findOne(id);
-      user.email = email;
-      user.username = username;
-      user.tokenVerify = tokenVerify;
+      if (passwordCompare != user.password) {
+        throw new BadRequestException('Password wrong');
+      }
 
-      const rs = await this.usersRepository.save(user);
-      return rs;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  public async changePasswordService(filter: any) {
-    const { id, newPassword, index } = filter;
-    try {
-      const user = await this.usersRepository.findOne(id);
-
-      user.seed = bcrypt.genSaltSync(10);
-
-      const password = bcrypt.hashSync(newPassword, user.seed);
-
-      user.index = index;
-      user.password = password;
-
-      const rs = await this.usersRepository.save(user);
-      return rs;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  public async removeUser(deleteOneUser: DeleteOneUser) {
-    try {
-      const { id } = deleteOneUser;
-      await this.followsService.deletefollow(id);
-
-      const rs = await this.usersRepository.delete(id);
-      return rs;
+      const { id } = user;
+      const accessToken = this.jwtService.sign({ id });
+      return accessToken;
     } catch (error) {
       throw error;
     }

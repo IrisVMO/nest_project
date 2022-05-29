@@ -8,24 +8,15 @@ import {
   Get,
   Res,
   Param,
-  Post,
   Req,
   Patch,
-  Inject,
   Query,
-  BadRequestException,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
-import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
-import { MailService } from '../../configs/mail/mail.service';
-// import { configs } from '../../configs/config';
 import { UsersService } from './users.service';
 import {
-  CreateUserdto,
-  VerifyAccountdto,
-  Logindto,
   UpdateInfordto,
   ChangePassworddto,
   GetOneUserdto,
@@ -36,109 +27,7 @@ import {
 @ApiTags('Users')
 @Controller('api/users')
 export class UsersController {
-  constructor(
-    private readonly usersService: UsersService,
-    // @Inject(forwardRef(() => JwtService))
-    @Inject(JwtService)
-    private readonly jwtService: JwtService,
-    private readonly mailService: MailService,
-  ) {}
-
-  @Post('signup')
-  @ApiResponse({ status: 201, description: 'Created' })
-  @ApiResponse({ status: 409, description: 'Confilic' })
-  @ApiResponse({ status: 400, description: 'Bad request' })
-  public async sigup(@Body() createUserDto: CreateUserdto, @Res() res) {
-    try {
-      const isExistEmail = await this.usersService.findOneUser({
-        email: createUserDto.email,
-      });
-
-      if (isExistEmail) {
-        throw new HttpException('Email already exists', HttpStatus.CONFLICT);
-      }
-
-      const isExistUsername = await this.usersService.findOneUser({
-        username: createUserDto.username,
-      });
-
-      if (isExistUsername) {
-        throw new HttpException('Username already exists', HttpStatus.CONFLICT);
-      }
-
-      const user = await this.usersService.create(createUserDto);
-      // const { id } = user;
-
-      // if (process.env.NODE_ENV != 'test') {
-      //   const tokenVerify = this.jwtService.sign({ id });
-      //   const option = {
-      //     from: configs.emailHelper,
-      //     to: user.email,
-      //     subject: 'Wellcom to UNIVERSE PHOTOS',
-      //     html: `<p>
-      //         Please verify your account
-      //         <a href='http://${configs.host}:${configs.port}/api/users/verify/${tokenVerify}'>Verify Account</a>
-      //       </p>`,
-      //   };
-
-      //   await this.usersService.updateInforService({ tokenVerify, id });
-      //   this.mailService.sendMail(option);
-      // }
-
-      res.json({ data: user });
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  @Get('verify/:tokenVerify')
-  public async verifyAccount(
-    @Param() verifyAccountdto: VerifyAccountdto,
-    @Res() res,
-  ) {
-    try {
-      const { tokenVerify } = verifyAccountdto;
-      const decode = this.jwtService.verify(tokenVerify);
-
-      const data = await this.usersService.verifyAccount(decode.id);
-      res.json(data);
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  @Post('login')
-  @ApiResponse({ status: 201, description: 'Ok' })
-  @ApiResponse({ status: 400, description: 'Bad request' })
-  public async Login(@Body() loginDto: Logindto, @Res() res) {
-    try {
-      const { password } = loginDto;
-      const user = await this.usersService.findOneUser(loginDto);
-
-      if (!user) {
-        throw new BadRequestException('Email or username wrong');
-      }
-
-      if (user.tokenVerify) {
-        throw new BadRequestException(
-          'Please verify account in your email address',
-        );
-      }
-
-      const passwordCompare = bcrypt.hashSync(password, user.seed);
-
-      if (passwordCompare != user.password) {
-        throw new BadRequestException('Password wrong');
-      }
-
-      const { id, index } = user;
-      const accessToken = this.jwtService.sign({ id, index });
-
-      res.json({ data: user, accessToken });
-    } catch (error) {
-      throw error;
-    }
-  }
+  constructor(private readonly usersService: UsersService) {}
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
@@ -198,12 +87,9 @@ export class UsersController {
         throw new HttpException('Password wrong', HttpStatus.BAD_REQUEST);
       }
 
-      const index = Math.floor(Math.random() * 10000);
-
       const data = await this.usersService.changePasswordService({
         newPassword,
         id,
-        index,
       });
 
       res.json({ data });

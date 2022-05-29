@@ -35,9 +35,6 @@ export class User {
   password: string;
 
   @Column({ nullable: true })
-  index: number;
-
-  @Column({ nullable: true })
   tokenVerify: string;
 
   @Column({
@@ -64,9 +61,6 @@ export class User {
 
   @OneToMany(() => Photo, (photo) => photo.user)
   photos: Photo[];
-
-  // @ManyToMany(() => Album, (album) => album.users)
-  // albums: Album[];
 
   @OneToMany(() => AlbumUser, (albumUser) => albumUser.user)
   albumUsers: AlbumUser[];
