@@ -379,31 +379,6 @@ describe('E2e test feature Likes', () => {
       .expect(401);
   });
 
-  // Unlike
-  it('Create [DELETE /api/likes]', async () => {
-    await request(app.getHttpServer())
-      .delete('/api/likes')
-      .set({ Authorization: `Bearer ${accessToken}` })
-      .send({ photoId: photo.id })
-      .expect(200);
-  });
-
-  it('Create [DELETE /api/likes/:id] 400 Bad Request', async () => {
-    await request(app.getHttpServer())
-      .delete('/api/likes')
-      .set({ Authorization: `Bearer ${accessToken}` })
-      .send({})
-      .expect(400);
-  });
-
-  it('Create [DELETE /api/likes/:id] 401 Unauthorization', async () => {
-    await request(app.getHttpServer())
-      .delete('/api/likes')
-      .set({ Authorization: 'Bearer' })
-      .send({ photoId: photo.id })
-      .expect(401);
-  });
-
   // Get All Like In A Photo
   it('Create [GET /api/likes/allLikeInPhoto/:photoId]', async () => {
     await request(app.getHttpServer())
