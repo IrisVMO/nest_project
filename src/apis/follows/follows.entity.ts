@@ -21,7 +21,10 @@ export class Follow {
   @Column({ generated: 'uuid' })
   userIdFollowing: string;
 
-  @ManyToOne(() => User, (user) => user.follows)
+  @ManyToOne(() => User, (user) => user.follows, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   user: User;
 }

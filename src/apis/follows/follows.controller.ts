@@ -1,16 +1,8 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Post,
-  Req,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { FollowsService } from './follows.service';
-import { Followdto, UnFollowdto } from './follows.dto';
+import { Followdto } from './follows.dto';
 
 @ApiTags('Follows')
 @Controller('api/follows')
@@ -31,31 +23,6 @@ export class FollowsController {
 
       res.json({ data });
     } catch (error) {
-      throw error;
-    }
-  }
-
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
-  @Delete(':id')
-  @ApiResponse({ status: 200, description: 'Ok' })
-  @ApiResponse({ status: 400, description: 'Bad Request' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  public async unFollow(
-    @Body() unFollowdto: UnFollowdto,
-    @Res() res,
-    @Req() req,
-  ) {
-    console.log('unFollowdto:', unFollowdto);
-
-    const { id: userId } = req.user;
-    try {
-      const data = await this.followsService.unFollow(unFollowdto, userId);
-
-      res.json({ data });
-    } catch (error) {
-      console.log('error:', error);
-
       throw error;
     }
   }

@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsUUID } from 'class-validator';
-// import { IsNotEmpty, IsString, IsUUID, MaxLength } from 'class-validator';
 
 export class Likedto {
   @ApiProperty()
@@ -22,11 +21,4 @@ export class AllLikeInAPhotoPagedto {
 
   @ApiProperty()
   page: number;
-}
-
-export class UnLikedto {
-  @ApiProperty()
-  @IsUUID()
-  @IsNotEmpty()
-  photoId: string;
 }

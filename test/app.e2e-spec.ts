@@ -561,30 +561,6 @@ describe('E2e test feature Follows', () => {
       .send({ userIdFollowing: user2.id })
       .expect(401);
   });
-
-  // Unfollow
-  it('Create [DELETE /api/follows/:id]', async () => {
-    console.log('user2.id:', user2.id);
-
-    await request(app.getHttpServer())
-      .delete(`/api/follows/${user2.id}`)
-      .set({ Authorization: `Bearer ${accessToken}` })
-      .expect(200);
-  });
-
-  it('Create [DELETE /api/follows/:id] 400 Bad Request', async () => {
-    await request(app.getHttpServer())
-      .delete(`/api/follows/${'id'}`)
-      .set({ Authorization: `Bearer ${accessToken}` })
-      .expect(400);
-  });
-
-  it('Create [DELETE /api/follows/:id] 401 Unauthorization', async () => {
-    await request(app.getHttpServer())
-      .delete(`/api/follows/${user2.id}`)
-      .set({ Authorization: 'Bearer' })
-      .expect(401);
-  });
 });
 
 describe('E2e test feature Photos', () => {

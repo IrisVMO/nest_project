@@ -26,9 +26,15 @@ export class Like {
   @UpdateDateColumn({ name: 'Updated_At', type: 'timestamp' })
   updatedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.likes)
+  @ManyToOne(() => User, (user) => user.likes, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   user: User;
 
-  @ManyToOne(() => Photo, (photo) => photo.likes)
+  @ManyToOne(() => Photo, (photo) => photo.likes, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   photo: Photo;
 }

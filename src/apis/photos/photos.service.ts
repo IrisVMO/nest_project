@@ -103,19 +103,6 @@ export class PhotosService {
     }
   }
 
-  // public async newFeed(following: any) {
-  //   try {
-  //     const rs = await this.photosRepository.find({
-  //       where: { userId: In(following) },
-  //       order: { createdAt: 'DESC' },
-  //       take: 10,
-  //     });
-  //     return rs;
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // }
-
   public async getOnePhoto(getOnePhotodto: GetOnePhotodto, userId: string) {
     const { id } = getOnePhotodto;
     try {

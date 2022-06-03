@@ -12,12 +12,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-import {
-  Likedto,
-  CountLikedto,
-  UnLikedto,
-  AllLikeInAPhotoPagedto,
-} from './likes.dto';
+import { Likedto, CountLikedto, AllLikeInAPhotoPagedto } from './likes.dto';
 import { LikesService } from './likes.service';
 
 @ApiTags('Likes')
@@ -57,23 +52,6 @@ export class LikesController {
         countLikedto,
         allLikeInAPhotoPagedto,
       );
-      res.json({ data });
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
-  @Delete()
-  @ApiResponse({ status: 200, description: 'Ok' })
-  @ApiResponse({ status: 400, description: 'Bad request' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  public async unLike(@Body() unLikedto: UnLikedto, @Res() res, @Req() req) {
-    try {
-      const { id: userId } = req.user;
-
-      const data = await this.likesService.unLike(unLikedto, userId);
       res.json({ data });
     } catch (error) {
       throw error;

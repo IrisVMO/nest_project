@@ -47,10 +47,16 @@ export class Photo {
   @UpdateDateColumn({ name: 'Updated_At', type: 'timestamp' })
   updatedAt: Date;
 
-  @ManyToOne(() => Album, (album) => album.photos)
+  @ManyToOne(() => Album, (album) => album.photos, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   album: Album;
 
-  @ManyToOne(() => User, (user) => user.photos)
+  @ManyToOne(() => User, (user) => user.photos, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   user: User;
 
   @OneToMany(() => Like, (like) => like.photo)

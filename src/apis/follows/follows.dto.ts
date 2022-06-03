@@ -7,10 +7,3 @@ export class Followdto {
   @IsUUID()
   userIdFollowing: string;
 }
-
-export class UnFollowdto {
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsUUID()
-  userIdFollowing: string;
-}

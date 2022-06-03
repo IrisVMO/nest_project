@@ -29,9 +29,15 @@ export class Comment {
   @UpdateDateColumn({ name: 'Updated_At', type: 'timestamp' })
   updatedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.comments)
+  @ManyToOne(() => User, (user) => user.comments, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   user: User;
 
-  @ManyToOne(() => Photo, (photo) => photo.comments)
+  @ManyToOne(() => Photo, (photo) => photo.comments, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   photo: Photo;
 }

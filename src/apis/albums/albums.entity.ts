@@ -73,9 +73,15 @@ export class AlbumUser {
   @Column({ type: 'enum', enum: StatusAlbumUser, default: 'Active' })
   status: StatusAlbumUser;
 
-  @ManyToOne(() => Album, (album) => album.albumUsers)
+  @ManyToOne(() => Album, (album) => album.albumUsers, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   album: Album;
 
-  @ManyToOne(() => User, (user) => user.albumUsers)
+  @ManyToOne(() => User, (user) => user.albumUsers, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   user: User;
 }

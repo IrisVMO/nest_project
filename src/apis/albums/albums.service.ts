@@ -202,10 +202,20 @@ export class AlbumsService {
     }
   }
 
-  public async remove(deleteAlbumdto: DeleteAlbumdto) {
+  public async remove(deleteAlbumdto: DeleteAlbumdto, userId: string) {
     try {
       const { id } = deleteAlbumdto;
-      await this.albumsRepository.delete({ id });
+
+      const albumUser = await this.albumUsersRepository.findOne({
+        where: { albumId: id, userId },
+      });
+
+      if (!albumUser || albumUser.role != 'Owner') {
+        throw new ForbiddenException('You can permission to delete the album');
+      } else {
+        const rs = await this.albumsRepository.delete({ id });
+        return rs;
+      }
     } catch (error) {
       throw error;
     }

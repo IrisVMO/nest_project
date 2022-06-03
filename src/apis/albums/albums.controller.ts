@@ -172,9 +172,11 @@ export class AlbumsController {
   public async deleteAlbum(
     @Res() res,
     @Param() deleteAlbumdto: DeleteAlbumdto,
+    @Req() req,
   ) {
+    const { id: userId } = req.user;
     try {
-      const data = await this.albumsService.remove(deleteAlbumdto);
+      const data = await this.albumsService.remove(deleteAlbumdto, userId);
       res.json({ data });
     } catch (error) {
       throw error;
