@@ -91,11 +91,6 @@
       "!**/node_modules/**",
       "!**/vendor/**"
     ],
-    "coverageThreshold": {
-      "global": {
-        "lines": 90
-      }
-    },
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
   }
