@@ -17,11 +17,11 @@ import * as bcrypt from 'bcrypt';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
 import {
-  UpdateInfordto,
-  ChangePassworddto,
-  GetOneUserdto,
-  DeleteOneUser,
-  GetAllUserdto,
+  UpdateInforDto,
+  ChangePasswordDto,
+  GetOneUserDto,
+  DeleteOneUserDto,
+  GetAllUserDto,
 } from './users.dto';
 
 @ApiTags('Users')
@@ -34,9 +34,9 @@ export class UsersController {
   @Get()
   @ApiResponse({ status: 200, description: 'Ok' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  public async findAll(@Query() getAllUserdto: GetAllUserdto, @Res() res) {
+  public async findAll(@Query() getAllUserDto: GetAllUserDto, @Res() res) {
     try {
-      const data = await this.usersService.findAllUser(getAllUserdto);
+      const data = await this.usersService.findAllUser(getAllUserDto);
       res.json({ data });
     } catch (error) {
       throw error;
@@ -45,14 +45,14 @@ export class UsersController {
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Get('one/:id')
+  @Get('getOne/:id')
   @ApiResponse({ status: 200, description: 'Ok' })
   @ApiResponse({ status: 404, description: 'Not found' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  public async findOne(@Param() getOneUserdto: GetOneUserdto, @Res() res) {
+  public async findOne(@Param() getOneUserDto: GetOneUserDto, @Res() res) {
     try {
-      const data = await this.usersService.findOneUser(getOneUserdto);
+      const data = await this.usersService.findOneUser(getOneUserDto);
 
       if (!data) {
         throw new HttpException('User is not found', HttpStatus.NOT_FOUND);
@@ -71,11 +71,11 @@ export class UsersController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async changePassword(
-    @Body() changePassworddto: ChangePassworddto,
+    @Body() changePasswordDto: ChangePasswordDto,
     @Res() res,
     @Req() req,
   ) {
-    const { currentPassword, newPassword } = changePassworddto;
+    const { currentPassword, newPassword } = changePasswordDto;
     const { id } = req.user;
     try {
       const user = await this.usersService.findOneUser({ id });
@@ -87,7 +87,7 @@ export class UsersController {
         throw new HttpException('Password wrong', HttpStatus.BAD_REQUEST);
       }
 
-      const data = await this.usersService.changePasswordService({
+      const data = await this.usersService.changePassword({
         newPassword,
         id,
       });
@@ -105,13 +105,13 @@ export class UsersController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async updateInfor(
-    @Body() updateUserDto: UpdateInfordto,
+    @Body() updateUserDto: UpdateInforDto,
     @Res() res,
     @Req() req,
   ) {
     const { id } = req.user;
     try {
-      const data = await this.usersService.updateInforService({
+      const data = await this.usersService.updateUserInfo({
         ...updateUserDto,
         id,
       });
@@ -128,7 +128,10 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Ok' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  public async removeUser(@Param() deleteOneUser: DeleteOneUser, @Res() res) {
+  public async removeUser(
+    @Param() deleteOneUser: DeleteOneUserDto,
+    @Res() res,
+  ) {
     try {
       const data = await this.usersService.removeUser(deleteOneUser);
       res.json({ data });

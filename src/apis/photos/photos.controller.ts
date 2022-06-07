@@ -27,14 +27,14 @@ import * as path from 'path';
 import { editFileName, imageFileFilter } from '../../configs/uploadFile';
 import { PhotosService } from './photos.service';
 import {
-  CreatePhotodto,
-  GetOnePhotodto,
-  SearchPhotodto,
-  UpdatePhotodto,
-  DeleteOnePhotodto,
-  AllPhotoInAlbum,
-  AllPhotoInAlbumPage,
-  UpdatePhotodtoParam,
+  CreatePhotoDto,
+  GetOnePhotoDto,
+  SearchPhotoDto,
+  UpdatePhotoDto,
+  DeleteOnePhotoDto,
+  AllPhotoInAlbumParamDto,
+  AllPhotoInAlbumQueryDto,
+  UpdatePhotoDtoParam,
 } from './photos.dto';
 
 @ApiTags('photos')
@@ -78,14 +78,14 @@ export class PhotosController {
   )
   public async uploadedFile(
     @UploadedFile() file,
-    @Body() photodto: CreatePhotodto,
+    @Body() photoDto: CreatePhotoDto,
     @Res() res,
     @Req() req,
   ) {
     const link = path.join('./images', file.filename);
     const { id: userId } = req.user;
     try {
-      const data = await this.photosService.createPhoto(photodto, link, userId);
+      const data = await this.photosService.createPhoto(photoDto, link, userId);
       res.json({ data });
     } catch (error) {
       throw error;
@@ -100,14 +100,14 @@ export class PhotosController {
   @ApiResponse({ status: 404, description: 'Not found' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async updatePhoto(
-    @Param() updatePhotodtoParam: UpdatePhotodtoParam,
-    @Body() updatePhotodto: UpdatePhotodto,
+    @Param() updatePhotoDtoParam: UpdatePhotoDtoParam,
+    @Body() updatePhotoDto: UpdatePhotoDto,
     @Res() res,
   ) {
     try {
       const data = await this.photosService.updatePhoto(
-        updatePhotodto,
-        updatePhotodtoParam,
+        updatePhotoDto,
+        updatePhotoDtoParam,
       );
       res.json({ data });
     } catch (error) {
@@ -122,13 +122,13 @@ export class PhotosController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async getOnePhoto(
-    @Param() getOnePhotodto: GetOnePhotodto,
+    @Param() getOnePhotoDto: GetOnePhotoDto,
     @Req() req,
     @Res() res,
   ) {
     const { id: userId } = req.user;
     try {
-      const data = await this.photosService.getOnePhoto(getOnePhotodto, userId);
+      const data = await this.photosService.getOnePhoto(getOnePhotoDto, userId);
       res.json({ data });
     } catch (error) {
       throw error;
@@ -142,14 +142,14 @@ export class PhotosController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async allPhotoInAnAlbum(
-    @Param() allPhotoInAlbum: AllPhotoInAlbum,
-    @Query() allPhotoInAlbumPage: AllPhotoInAlbumPage,
+    @Param() allPhotoInAlbumDto: AllPhotoInAlbumParamDto,
+    @Query() allPhotoInAlbumPageDto: AllPhotoInAlbumQueryDto,
     @Res() res,
   ) {
     try {
       const data = await this.photosService.getAllPhotoInAnAlbum(
-        allPhotoInAlbum,
-        allPhotoInAlbumPage,
+        allPhotoInAlbumDto,
+        allPhotoInAlbumPageDto,
       );
       res.json({ data });
     } catch (error) {
@@ -163,14 +163,14 @@ export class PhotosController {
   @ApiResponse({ status: 200, description: 'Ok' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async searchPhoto(
-    @Query() searchPhotodto: SearchPhotodto,
+    @Query() searchPhotoDto: SearchPhotoDto,
     @Res() res,
     @Req() req,
   ) {
     const { id: userId } = req.user;
     try {
       const data = await this.photosService.searchByPhotoCaption(
-        searchPhotodto,
+        searchPhotoDto,
         userId,
       );
       res.json({ data });
@@ -201,12 +201,12 @@ export class PhotosController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async deleteOnePhoto(
-    @Param() deleteOnePhotodto: DeleteOnePhotodto,
+    @Param() deleteOnePhotoDto: DeleteOnePhotoDto,
     @Req() req,
     @Res() res,
   ) {
     try {
-      const data = await this.photosService.deleteOnePhoto(deleteOnePhotodto);
+      const data = await this.photosService.deleteOnePhoto(deleteOnePhotoDto);
       res.json({ data });
     } catch (error) {
       throw error;

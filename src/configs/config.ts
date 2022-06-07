@@ -33,17 +33,7 @@ const dbtest = {
 
 const db = process.env.NODE_ENV === 'test' ? dbtest : dbDev;
 
-const APIResponse = class {
-  success: boolean;
-  data: object;
-  constructor(success = true, data = {}) {
-    this.success = success;
-    this.data = data;
-  }
-};
-
 export const configs = {
-  APIResponse,
   pagination: {
     page: 1,
     recordsAPage: 20,

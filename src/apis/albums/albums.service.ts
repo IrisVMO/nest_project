@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   forwardRef,
   Inject,
@@ -20,13 +21,14 @@ import {
 } from './albums.entity';
 import {
   CreateAlbumDto,
-  DeleteAlbumdto,
-  InviteContributedto,
-  SearchAlbumdto,
-  UpdateAlbumParamdto,
-  UpdateAlbumdto,
-  AcceptContribueParamdto,
-  AcceptContribueQuerydto,
+  DeleteAlbumDto,
+  InviteContributeDto,
+  SearchAlbumDto,
+  UpdateAlbumParamDto,
+  UpdateAlbumDto,
+  AcceptContribueParamDto,
+  AcceptContribueQueryDto,
+  GetOneAlbumDto,
 } from './albums.dto';
 
 @Injectable()
@@ -66,8 +68,11 @@ export class AlbumsService {
     }
   }
 
-  public async findOneAlbumService(getOneAlbumdto: any, userId: string) {
-    const { id } = getOneAlbumdto;
+  public async findOneAlbumService(
+    getOneAlbumDto: GetOneAlbumDto,
+    userId: string,
+  ) {
+    const { id } = getOneAlbumDto;
     try {
       const albumUser = await this.albumUsersRepository.findOne({
         where: { albumId: id, userId: userId },
@@ -85,13 +90,13 @@ export class AlbumsService {
   }
 
   public async searchByAlbumName(
-    searchAlbumdto: SearchAlbumdto,
+    searchAlbumDto: SearchAlbumDto,
     userId: string,
   ) {
-    const take = searchAlbumdto.take || 10;
-    const page = searchAlbumdto.page || 1;
+    const take = searchAlbumDto.take || 10;
+    const page = searchAlbumDto.page || 1;
     const skip = (page - 1) * take;
-    const name = searchAlbumdto.name || '';
+    const name = searchAlbumDto.name || '';
     try {
       const rs = await this.albumsRepository
         .createQueryBuilder('album')
@@ -122,12 +127,15 @@ export class AlbumsService {
     }
   }
 
-  public async inviteContribute(inviteContributedto: InviteContributedto) {
-    const { id, userContribueId } = inviteContributedto;
+  public async inviteContribute(inviteContributeDto: InviteContributeDto) {
+    const { id, userContribueId } = inviteContributeDto;
     const albumUser = new AlbumUser();
     try {
       const user = await this.usersService.findOneUser({ id: userContribueId });
-      const album = await this.albumsRepository.findOne({ id });
+      const album = await this.albumsRepository.findOne(id);
+      if (!user || !album) {
+        throw new BadRequestException('Can not invite contributor');
+      }
 
       const { name } = album;
       albumUser.album = album;
@@ -158,8 +166,8 @@ export class AlbumsService {
   }
 
   public async reply(
-    acceptContribueParam: AcceptContribueParamdto,
-    acceptContribueQuery: AcceptContribueQuerydto,
+    acceptContribueParam: AcceptContribueParamDto,
+    acceptContribueQuery: AcceptContribueQueryDto,
   ) {
     try {
       const { id } = acceptContribueParam;
@@ -174,7 +182,6 @@ export class AlbumsService {
       });
 
       albumUser.status = status;
-
       const rs = await this.albumUsersRepository.save(albumUser);
       return rs;
     } catch (error) {
@@ -183,11 +190,11 @@ export class AlbumsService {
   }
 
   public async updateAlbum(
-    updateAlbumDto: UpdateAlbumdto,
-    paramUpdateAlbumdto: UpdateAlbumParamdto,
+    updateAlbumDto: UpdateAlbumDto,
+    paramUpdateAlbumDto: UpdateAlbumParamDto,
   ) {
     const { name, description, status } = updateAlbumDto;
-    const { id } = paramUpdateAlbumdto;
+    const { id } = paramUpdateAlbumDto;
     try {
       const album = await this.albumsRepository.findOne(id);
       album.name = name;
@@ -195,16 +202,15 @@ export class AlbumsService {
       album.status = status;
 
       const rs = await this.albumsRepository.save(album);
-
       return rs;
     } catch (error) {
       throw error;
     }
   }
 
-  public async remove(deleteAlbumdto: DeleteAlbumdto, userId: string) {
+  public async remove(deleteAlbumDto: DeleteAlbumDto, userId: string) {
     try {
-      const { id } = deleteAlbumdto;
+      const { id } = deleteAlbumDto;
 
       const albumUser = await this.albumUsersRepository.findOne({
         where: { albumId: id, userId },

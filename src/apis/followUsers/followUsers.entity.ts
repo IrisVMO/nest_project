@@ -7,8 +7,8 @@ import {
 } from 'typeorm';
 import { User } from '../users/users.entity';
 
-@Entity({ name: 'Follow' })
-export class Follow {
+@Entity({ name: 'FollowUser' })
+export class FollowUser {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -21,7 +21,7 @@ export class Follow {
   @Column({ generated: 'uuid' })
   userIdFollowing: string;
 
-  @ManyToOne(() => User, (user) => user.follows, {
+  @ManyToOne(() => User, (user) => user.followUsers, {
     cascade: true,
     onDelete: 'CASCADE',
   })

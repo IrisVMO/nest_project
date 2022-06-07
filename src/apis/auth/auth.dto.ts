@@ -7,7 +7,7 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class Registerdto {
+export class RegisterDto {
   @ApiProperty({ example: 'Iris123' })
   @IsNotEmpty()
   @IsString()
@@ -25,14 +25,14 @@ export class Registerdto {
   password: string;
 }
 
-export class VerifyAccountdto {
+export class VerifyAccountDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
   tokenVerify: string;
 }
 
-export class Logindto {
+export class LoginDto {
   @ApiProperty({ example: 'Iris123' })
   username: string;
 

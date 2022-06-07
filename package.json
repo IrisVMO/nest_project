@@ -18,7 +18,7 @@
     "test:watch": "jest --watch",
     "test:cov": "cross-env NODE_ENV=test jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "cross-env NODE_ENV=test jest --config ./test/jest-e2e.json"
+    "test:e2e": "cross-env NODE_ENV=test jest --config .jest-e2e.json"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.6.1",
@@ -30,6 +30,7 @@
     "@nestjs/platform-express": "^8.4.5",
     "@nestjs/swagger": "^5.2.1",
     "@nestjs/typeorm": "^8.0.3",
+    "@nestjs/websockets": "^8.4.6",
     "@types/bcrypt": "^5.0.0",
     "bcrypt": "^5.0.1",
     "class-transformer": "^0.5.1",
@@ -47,6 +48,7 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
+    "socket.io": "^4.5.1",
     "swagger-ui-express": "^4.4.0",
     "typeorm": "^0.2.45"
   },
@@ -80,16 +82,13 @@
       "json",
       "ts"
     ],
-    "rootDir": "test",
-    "testRegex": ".*\\.e2e-spec\\.ts$",
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
-    "collectCoverage": true,
     "collectCoverageFrom": [
-      "**/*.(t|j)s",
-      "!**/node_modules/**",
-      "!**/vendor/**"
+      "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"

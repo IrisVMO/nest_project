@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { Like } from '../likes/likes.entity';
 import { Comment } from '../comments/comments.entity';
-import { Follow } from '../follows/follows.entity';
+import { FollowUser } from '../followUsers/followUsers.entity';
 import { Photo } from '../photos/photos.entity';
 import { AlbumUser } from '../albums/albums.entity';
 
@@ -50,8 +50,8 @@ export class User {
   @UpdateDateColumn({ name: 'Updated_At', type: 'timestamp' })
   updatedAt: Date;
 
-  @OneToMany(() => Follow, (follow) => follow.user)
-  follows: Follow[];
+  @OneToMany(() => FollowUser, (followUsers) => followUsers.user)
+  followUsers: FollowUser[];
 
   @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];

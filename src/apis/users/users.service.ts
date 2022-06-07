@@ -3,8 +3,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from './users.entity';
-import { DeleteOneUser, GetAllUserdto } from './users.dto';
-import { Registerdto } from '../auth/auth.dto';
+import { DeleteOneUserDto, GetAllUserDto } from './users.dto';
+import { RegisterDto } from '../auth/auth.dto';
+import {
+  ChangePassword,
+  FindOneUserInterface,
+  UpdateUserInterface,
+} from './users.interface';
 
 @Injectable()
 export class UsersService {
@@ -13,13 +18,13 @@ export class UsersService {
     private readonly usersRepository: Repository<User>,
   ) {}
 
-  public async createUser(Registerdto: Registerdto) {
+  public async createUser(RegisterDto: RegisterDto) {
     try {
       const user = new User();
       user.seed = bcrypt.genSaltSync(10);
-      user.username = Registerdto.username;
-      user.email = Registerdto.email;
-      user.password = bcrypt.hashSync(`${Registerdto.password}`, user.seed);
+      user.username = RegisterDto.username;
+      user.email = RegisterDto.email;
+      user.password = bcrypt.hashSync(`${RegisterDto.password}`, user.seed);
 
       const rs = await this.usersRepository.save(user);
       return rs;
@@ -45,11 +50,11 @@ export class UsersService {
     }
   }
 
-  public async findAllUser(getAllUserdto: GetAllUserdto) {
-    const take = getAllUserdto.take || 10;
-    const page = getAllUserdto.page || 1;
+  public async findAllUser(getAllUserDto: GetAllUserDto) {
+    const take = getAllUserDto.take || 10;
+    const page = getAllUserDto.page || 1;
     const skip = (page - 1) * take;
-    const filter = getAllUserdto.filter || '';
+    const filter = getAllUserDto.filter || '';
 
     try {
       const [result, total] = await this.usersRepository.findAndCount({
@@ -68,30 +73,26 @@ export class UsersService {
     }
   }
 
-  public async findOneUser(filter: any) {
-    const { id, username, email } = filter;
+  public async findOneUser(findOneUserInterface: FindOneUserInterface) {
+    const { id, username, email } = findOneUserInterface;
     try {
-      if (!id) {
-        const rs = await this.usersRepository.findOne({
-          where: [{ email }, { username }],
-        });
-        return rs;
-      }
-
-      const rs = await this.usersRepository.findOne(id);
+      const rs = await this.usersRepository.findOne({
+        where: [{ email }, { username }, { id }],
+      });
       return rs;
     } catch (error) {
       throw error;
     }
   }
 
-  public async updateInforService(updateUserField: any) {
-    const { id, username, tokenVerify, email } = updateUserField;
+  public async updateUserInfo(updateUserInterface: UpdateUserInterface) {
+    const { username, tokenVerify, email, status, id } = updateUserInterface;
     try {
       const user = await this.usersRepository.findOne(id);
       user.email = email;
       user.username = username;
       user.tokenVerify = tokenVerify;
+      user.status = status;
 
       const rs = await this.usersRepository.save(user);
       return rs;
@@ -100,8 +101,8 @@ export class UsersService {
     }
   }
 
-  public async changePasswordService(filter: any) {
-    const { id, newPassword } = filter;
+  public async changePassword(changePassword: ChangePassword) {
+    const { id, newPassword } = changePassword;
     try {
       const user = await this.usersRepository.findOne(id);
 
@@ -118,9 +119,9 @@ export class UsersService {
     }
   }
 
-  public async removeUser(deleteOneUser: DeleteOneUser) {
+  public async removeUser(deleteOneUserDto: DeleteOneUserDto) {
     try {
-      const { id } = deleteOneUser;
+      const { id } = deleteOneUserDto;
 
       const rs = await this.usersRepository.delete(id);
       return rs;

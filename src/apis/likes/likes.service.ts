@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Like } from './likes.entity';
-import { AllLikeInAPhotoPagedto, CountLikedto, Likedto } from './likes.dto';
+import { AllLikeInAPhotoPageDto, CountLikeDto, LikeDto } from './likes.dto';
 import { PhotosService } from '../photos/photos.service';
 import { UsersService } from '../users/users.service';
 
@@ -15,8 +15,8 @@ export class LikesService {
     private readonly usersService: UsersService,
   ) {}
 
-  public async createLike(likedto: Likedto, userId: string) {
-    const { photoId: id } = likedto;
+  public async createLike(likeDto: LikeDto, userId: string) {
+    const { photoId: id } = likeDto;
     let like: Like;
     try {
       const [user, photo] = await Promise.all([
@@ -52,11 +52,11 @@ export class LikesService {
   }
 
   public async allLikeInPhoto(
-    countLike: CountLikedto,
-    allLikeInAPhotoPagedto: AllLikeInAPhotoPagedto,
+    countLike: CountLikeDto,
+    allLikeInAPhotoPageDto: AllLikeInAPhotoPageDto,
   ) {
-    const take = allLikeInAPhotoPagedto.take || 10;
-    const page = allLikeInAPhotoPagedto.page || 1;
+    const take = allLikeInAPhotoPageDto.take || 10;
+    const page = allLikeInAPhotoPageDto.page || 1;
     const skip = (page - 1) * take;
     try {
       const rs = await this.likesRepository.findAndCount({

@@ -15,11 +15,11 @@ import {
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import {
-  Commentdto,
-  UpdateCommentdto,
-  DeleteCommentdto,
-  GetAllCommentPhotodto,
-  GetAllCommentPhotoPagedto,
+  CommentDto,
+  UpdateCommentDto,
+  DeleteCommentDto,
+  GetAllCommentPhotoDto,
+  GetAllCommentPhotoPageDto,
 } from './comments.dto';
 
 @ApiTags('Comments')
@@ -31,13 +31,13 @@ export class CommentsController {
   @UseGuards(AuthGuard('jwt'))
   @Post()
   public async createComment(
-    @Body() commentdto: Commentdto,
+    @Body() commentDto: CommentDto,
     @Res() res,
     @Req() req,
   ) {
     const { id: userId } = req.user;
     try {
-      const data = await this.commentsService.createComment(commentdto, userId);
+      const data = await this.commentsService.createComment(commentDto, userId);
 
       res.json({ data });
     } catch (error) {
@@ -52,14 +52,14 @@ export class CommentsController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async getAllCommentPhoto(
-    @Param() getAllCommentPhoto: GetAllCommentPhotodto,
-    @Query() getAllCommentPhotoPagedto: GetAllCommentPhotoPagedto,
+    @Param() getAllCommentPhoto: GetAllCommentPhotoDto,
+    @Query() getAllCommentPhotoPageDto: GetAllCommentPhotoPageDto,
     @Res() res,
   ) {
     try {
       const data = await this.commentsService.getAllCommentPhoto(
         getAllCommentPhoto,
-        getAllCommentPhotoPagedto,
+        getAllCommentPhotoPageDto,
       );
       res.json({ data });
     } catch (error) {
@@ -74,14 +74,14 @@ export class CommentsController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async updateComent(
-    @Body() updateCommentdto: UpdateCommentdto,
+    @Body() updateCommentDto: UpdateCommentDto,
     @Res() res,
     @Req() req,
   ) {
     const { id: userId } = req.user;
     try {
       const data = await this.commentsService.updateComment(
-        updateCommentdto,
+        updateCommentDto,
         userId,
       );
 
@@ -98,11 +98,11 @@ export class CommentsController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async deleteComment(
-    @Param() deleteCommentdto: DeleteCommentdto,
+    @Param() deleteCommentDto: DeleteCommentDto,
     @Res() res,
   ) {
     try {
-      const data = await this.commentsService.deleteComment(deleteCommentdto);
+      const data = await this.commentsService.deleteComment(deleteCommentDto);
       res.json({ data });
     } catch (error) {
       throw error;

@@ -4,11 +4,11 @@ import { Repository } from 'typeorm';
 import { PhotosService } from '../photos/photos.service';
 import { Comment } from './comments.entity';
 import {
-  Commentdto,
-  UpdateCommentdto,
-  DeleteCommentdto,
-  GetAllCommentPhotodto,
-  GetAllCommentPhotoPagedto,
+  CommentDto,
+  UpdateCommentDto,
+  DeleteCommentDto,
+  GetAllCommentPhotoDto,
+  GetAllCommentPhotoPageDto,
 } from './comments.dto';
 import { UsersService } from '../users/users.service';
 
@@ -21,8 +21,8 @@ export class CommentsService {
     private readonly usersService: UsersService,
   ) {}
 
-  public async createComment(commentdto: Commentdto, userId: string) {
-    const { comment, photoId: id } = commentdto;
+  public async createComment(commentDto: CommentDto, userId: string) {
+    const { comment, photoId: id } = commentDto;
     try {
       const user = await this.usersService.findOneUser({ id: userId });
       const photo = await this.photosService.getOnePhoto({ id }, userId);
@@ -40,11 +40,11 @@ export class CommentsService {
   }
 
   public async getAllCommentPhoto(
-    getAllCommentPhoto: GetAllCommentPhotodto,
-    getAllCommentPhotoPagedto: GetAllCommentPhotoPagedto,
+    getAllCommentPhoto: GetAllCommentPhotoDto,
+    getAllCommentPhotoPageDto: GetAllCommentPhotoPageDto,
   ) {
-    const take = getAllCommentPhotoPagedto.take || 10;
-    const page = getAllCommentPhotoPagedto.page || 1;
+    const take = getAllCommentPhotoPageDto.take || 10;
+    const page = getAllCommentPhotoPageDto.page || 1;
     const skip = (page - 1) * take;
     try {
       const rs = await this.commentsRepository.findAndCount({
@@ -60,10 +60,10 @@ export class CommentsService {
   }
 
   public async updateComment(
-    updateCommentdto: UpdateCommentdto,
+    updateCommentDto: UpdateCommentDto,
     userId: string,
   ) {
-    const { updateComment, photoId } = updateCommentdto;
+    const { updateComment, photoId } = updateCommentDto;
     try {
       const comments = await this.commentsRepository.findOne({
         where: { photoId, userId },
@@ -78,8 +78,8 @@ export class CommentsService {
     }
   }
 
-  public async deleteComment(deleteCommentdto: DeleteCommentdto) {
-    const { id } = deleteCommentdto;
+  public async deleteComment(deleteCommentDto: DeleteCommentDto) {
+    const { id } = deleteCommentDto;
     try {
       const rs = await this.commentsRepository.delete({ id });
       return rs;

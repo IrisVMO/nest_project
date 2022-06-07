@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
-export class Commentdto {
+export class CommentDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
@@ -13,7 +13,7 @@ export class Commentdto {
   photoId: string;
 }
 
-export class UpdateCommentdto {
+export class UpdateCommentDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
@@ -25,14 +25,14 @@ export class UpdateCommentdto {
   photoId: string;
 }
 
-export class GetAllCommentPhotodto {
+export class GetAllCommentPhotoDto {
   @ApiProperty()
   @IsUUID()
   @IsNotEmpty()
   photoId: string;
 }
 
-export class GetAllCommentPhotoPagedto {
+export class GetAllCommentPhotoPageDto {
   @ApiProperty({ nullable: true })
   take: number;
 
@@ -40,7 +40,7 @@ export class GetAllCommentPhotoPagedto {
   page: number;
 }
 
-export class DeleteCommentdto {
+export class DeleteCommentDto {
   @ApiProperty()
   @IsUUID()
   @IsNotEmpty()

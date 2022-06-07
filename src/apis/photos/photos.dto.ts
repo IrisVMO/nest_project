@@ -6,7 +6,7 @@ export enum Status {
   Private = 'Private',
 }
 
-export class CreatePhotodto {
+export class CreatePhotoDto {
   @ApiProperty({ example: 'Mot ngay nang rat to ...' })
   caption: string;
 
@@ -16,14 +16,14 @@ export class CreatePhotodto {
   albumId: string;
 }
 
-export class AllPhotoInAlbum {
+export class AllPhotoInAlbumParamDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsUUID()
   albumId: string;
 }
 
-export class AllPhotoInAlbumPage {
+export class AllPhotoInAlbumQueryDto {
   @ApiProperty({ nullable: true })
   take: number;
 
@@ -31,14 +31,14 @@ export class AllPhotoInAlbumPage {
   page: number;
 }
 
-export class GetOnePhotodto {
+export class GetOnePhotoDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsUUID()
   id: string;
 }
 
-export class SearchPhotodto {
+export class SearchPhotoDto {
   @ApiProperty({ nullable: true })
   search: string;
 
@@ -49,20 +49,20 @@ export class SearchPhotodto {
   page: number;
 }
 
-export class DeleteOnePhotodto {
+export class DeleteOnePhotoDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsUUID()
   id: string;
 }
 
-export class UpdatePhotodtoParam {
+export class UpdatePhotoDtoParam {
   @ApiProperty()
   @IsNotEmpty()
   @IsUUID()
   id: string;
 }
-export class UpdatePhotodto {
+export class UpdatePhotoDto {
   @ApiProperty()
   @IsNotEmpty()
   caption: string;

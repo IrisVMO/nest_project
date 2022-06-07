@@ -9,14 +9,14 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {
-  AllPhotoInAlbum,
-  AllPhotoInAlbumPage,
-  CreatePhotodto,
-  DeleteOnePhotodto,
-  GetOnePhotodto,
-  SearchPhotodto,
-  UpdatePhotodto,
-  UpdatePhotodtoParam,
+  AllPhotoInAlbumParamDto,
+  AllPhotoInAlbumQueryDto,
+  CreatePhotoDto,
+  DeleteOnePhotoDto,
+  GetOnePhotoDto,
+  SearchPhotoDto,
+  UpdatePhotoDto,
+  UpdatePhotoDtoParam,
 } from './photos.dto';
 import { AlbumsService } from '../albums/albums.service';
 import { Photo, Status } from './photos.entity';
@@ -33,11 +33,11 @@ export class PhotosService {
   ) {}
 
   public async createPhoto(
-    photodto: CreatePhotodto,
+    photoDto: CreatePhotoDto,
     link: string,
     userId: string,
   ) {
-    const { caption, albumId } = photodto;
+    const { caption, albumId } = photoDto;
     try {
       const user = await this.usersService.findOneUser({ id: userId });
       const photo = new Photo();
@@ -59,8 +59,8 @@ export class PhotosService {
   }
 
   public async getAllPhotoInAnAlbum(
-    allPhotoInAlbum: AllPhotoInAlbum,
-    allPhotoInAlbumPage: AllPhotoInAlbumPage,
+    allPhotoInAlbum: AllPhotoInAlbumParamDto,
+    allPhotoInAlbumPage: AllPhotoInAlbumQueryDto,
   ) {
     const take = allPhotoInAlbumPage.take || 10;
     const page = allPhotoInAlbumPage.page || 1;
@@ -79,11 +79,11 @@ export class PhotosService {
   }
 
   public async updatePhoto(
-    updatePhotodto: UpdatePhotodto,
-    updatePhotodtoParam: UpdatePhotodtoParam,
+    updatePhotoDto: UpdatePhotoDto,
+    updatePhotoDtoParam: UpdatePhotoDtoParam,
   ) {
-    const { caption, status } = updatePhotodto;
-    const { id } = updatePhotodtoParam;
+    const { caption, status } = updatePhotoDto;
+    const { id } = updatePhotoDtoParam;
     try {
       const photo = await this.photosRepository.findOne(id);
       if (!photo) {
@@ -103,8 +103,8 @@ export class PhotosService {
     }
   }
 
-  public async getOnePhoto(getOnePhotodto: GetOnePhotodto, userId: string) {
-    const { id } = getOnePhotodto;
+  public async getOnePhoto(getOnePhotoDto: GetOnePhotoDto, userId: string) {
+    const { id } = getOnePhotoDto;
     try {
       const rs = await this.photosRepository
         .createQueryBuilder('photo')
@@ -137,13 +137,13 @@ export class PhotosService {
   }
 
   public async searchByPhotoCaption(
-    searchPhotodto: SearchPhotodto,
+    searchPhotoDto: SearchPhotoDto,
     userId: string,
   ) {
-    const take = searchPhotodto.take || 10;
-    const page = searchPhotodto.page || 1;
+    const take = searchPhotoDto.take || 10;
+    const page = searchPhotoDto.page || 1;
     const skip = (page - 1) * take;
-    const search = searchPhotodto.search || '';
+    const search = searchPhotoDto.search || '';
     try {
       const rs = await this.photosRepository
         .createQueryBuilder('photo')
@@ -182,10 +182,10 @@ export class PhotosService {
       const rs = await this.photosRepository
         .createQueryBuilder('photo')
         .innerJoin('photo.user', 'user')
-        .innerJoin('user.follows', 'follow')
+        .innerJoin('user.followUsers', 'followUsers')
         .innerJoin('photo.album', 'album')
         .innerJoin('album.albumUsers', 'albumUser')
-        .where('follow.userIdFollower=:userId', { userId })
+        .where('followUsers.userIdFollower=:userId', { userId })
         .andWhere(
           `(photo.status=:status)
           OR (albumUser.role=:roleOwner AND albumUser.userId=:userId)
@@ -210,9 +210,9 @@ export class PhotosService {
     }
   }
 
-  public async deleteOnePhoto(deleteOnePhotodto: DeleteOnePhotodto) {
+  public async deleteOnePhoto(deleteOnePhotoDto: DeleteOnePhotoDto) {
     try {
-      const { id } = deleteOnePhotodto;
+      const { id } = deleteOnePhotoDto;
 
       const rs = await this.photosRepository.delete({ id });
       return rs;

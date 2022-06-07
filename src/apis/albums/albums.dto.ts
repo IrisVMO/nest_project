@@ -24,21 +24,21 @@ export class CreateAlbumDto {
   description: string;
 }
 
-export class GetOneAlbumdto {
+export class GetOneAlbumDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsUUID()
   id: string;
 }
 
-export class GetAllPhotoInAlbumdto {
+export class GetAllPhotoInAlbumDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsUUID()
   id: string;
 }
 
-export class SearchAlbumdto {
+export class SearchAlbumDto {
   @ApiProperty({ example: 'Seas', nullable: true })
   name: string;
 
@@ -49,7 +49,7 @@ export class SearchAlbumdto {
   page: number;
 }
 
-export class InviteContributedto {
+export class InviteContributeDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsUUID()
@@ -61,7 +61,7 @@ export class InviteContributedto {
   userContribueId: string;
 }
 
-export class UpdateAlbumdto {
+export class UpdateAlbumDto {
   @ApiProperty()
   @IsNotEmpty()
   name: string;
@@ -74,21 +74,21 @@ export class UpdateAlbumdto {
   status: Status;
 }
 
-export class UpdateAlbumParamdto {
+export class UpdateAlbumParamDto {
   @ApiProperty()
   @IsUUID()
   @IsNotEmpty()
   id: string;
 }
 
-export class AcceptContribueParamdto {
+export class AcceptContribueParamDto {
   @ApiProperty()
   @IsUUID()
   @IsNotEmpty()
   id: string;
 }
 
-export class AcceptContribueQuerydto {
+export class AcceptContribueQueryDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
@@ -100,7 +100,7 @@ export class AcceptContribueQuerydto {
   status: StatusAlbumUser;
 }
 
-export class DeleteAlbumdto {
+export class DeleteAlbumDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsUUID()

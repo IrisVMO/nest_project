@@ -16,14 +16,14 @@ import { AuthGuard } from '@nestjs/passport';
 import { AlbumsService } from './albums.service';
 import {
   CreateAlbumDto,
-  GetOneAlbumdto,
-  UpdateAlbumdto,
-  UpdateAlbumParamdto,
-  DeleteAlbumdto,
-  SearchAlbumdto,
-  InviteContributedto,
-  AcceptContribueParamdto,
-  AcceptContribueQuerydto,
+  GetOneAlbumDto,
+  UpdateAlbumDto,
+  UpdateAlbumParamDto,
+  DeleteAlbumDto,
+  SearchAlbumDto,
+  InviteContributeDto,
+  AcceptContribueParamDto,
+  AcceptContribueQueryDto,
 } from './albums.dto';
 
 @ApiTags('Albums')
@@ -62,13 +62,13 @@ export class AlbumsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async getOneAlbum(
     @Res() res,
-    @Param() getOneAlbumdto: GetOneAlbumdto,
+    @Param() getOneAlbumDto: GetOneAlbumDto,
     @Req() req,
   ) {
     try {
       const { id: userId } = req.user;
       const data = await this.albumsService.findOneAlbumService(
-        getOneAlbumdto,
+        getOneAlbumDto,
         userId,
       );
       res.json({ data });
@@ -85,11 +85,11 @@ export class AlbumsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async inviteContribute(
     @Res() res,
-    @Body() inviteContributedto: InviteContributedto,
+    @Body() inviteContributeDto: InviteContributeDto,
   ) {
     try {
       const data = await this.albumsService.inviteContribute(
-        inviteContributedto,
+        inviteContributeDto,
       );
 
       res.json({ data });
@@ -104,8 +104,8 @@ export class AlbumsController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async reply(
-    @Param() acceptContribueParam: AcceptContribueParamdto,
-    @Query() acceptContribueQuery: AcceptContribueQuerydto,
+    @Param() acceptContribueParam: AcceptContribueParamDto,
+    @Query() acceptContribueQuery: AcceptContribueQueryDto,
     @Res() res,
   ) {
     try {
@@ -125,14 +125,14 @@ export class AlbumsController {
   @ApiResponse({ status: 200, description: 'Ok' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async searchPhoto(
-    @Query() searchPhotodto: SearchAlbumdto,
+    @Query() searchPhotoDto: SearchAlbumDto,
     @Res() res,
     @Req() req,
   ) {
     const { id: userId } = req.user;
     try {
       const data = await this.albumsService.searchByAlbumName(
-        searchPhotodto,
+        searchPhotoDto,
         userId,
       );
       res.json({ data });
@@ -148,14 +148,14 @@ export class AlbumsController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async updateAlbum(
-    @Body() updateAlbumDto: UpdateAlbumdto,
-    @Param() paramUpdateAlbumdto: UpdateAlbumParamdto,
+    @Body() updateAlbumDto: UpdateAlbumDto,
+    @Param() paramUpdateAlbumDto: UpdateAlbumParamDto,
     @Res() res,
   ) {
     try {
       const data = await this.albumsService.updateAlbum(
         updateAlbumDto,
-        paramUpdateAlbumdto,
+        paramUpdateAlbumDto,
       );
       res.json({ data });
     } catch (error) {
@@ -171,12 +171,12 @@ export class AlbumsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   public async deleteAlbum(
     @Res() res,
-    @Param() deleteAlbumdto: DeleteAlbumdto,
+    @Param() deleteAlbumDto: DeleteAlbumDto,
     @Req() req,
   ) {
     const { id: userId } = req.user;
     try {
-      const data = await this.albumsService.remove(deleteAlbumdto, userId);
+      const data = await this.albumsService.remove(deleteAlbumDto, userId);
       res.json({ data });
     } catch (error) {
       throw error;

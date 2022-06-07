@@ -1,10 +1,10 @@
 import { Test } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
-import { ChangePassworddto, UpdateInfordto } from '../src/apis/users/users.dto';
-import { AppModule } from '../src/app.module';
-import { CreateAlbumDto, UpdateAlbumdto } from '../src/apis/albums/albums.dto';
-import { Logindto, Registerdto } from '../src/apis/auth/auth.dto';
+import { ChangePasswordDto, UpdateInforDto } from './apis/users/users.dto';
+import { AppModule } from './app.module';
+import { CreateAlbumDto, UpdateAlbumDto } from './apis/albums/albums.dto';
+import { LoginDto, RegisterDto } from './apis/auth/auth.dto';
 
 const random = Math.floor(Math.random() * 100000000);
 const data_test = {
@@ -84,17 +84,16 @@ describe('E2e test feature Auth', () => {
   it('Create [POST /api/auth/register]', async () => {
     const response = await request(app.getHttpServer())
       .post('/api/auth/register')
-      .send(data_test.user1 as Registerdto)
+      .send(data_test.user1 as RegisterDto)
       .expect(201);
 
     user1 = response.body.data;
-    console.log('user1:', user1);
   });
 
   it('Create [POST /api/auth/register] Conflic', async () => {
     await request(app.getHttpServer())
       .post('/api/auth/register')
-      .send(data_test.user1 as Registerdto)
+      .send(data_test.user1 as RegisterDto)
       .expect(409);
   });
 
@@ -108,7 +107,7 @@ describe('E2e test feature Auth', () => {
   it('Create [POST /api/auth/register]', async () => {
     const response = await request(app.getHttpServer())
       .post('/api/auth/register')
-      .send(data_test.user2 as Registerdto)
+      .send(data_test.user2 as RegisterDto)
       .expect(201);
 
     user2 = response.body.data;
@@ -118,7 +117,7 @@ describe('E2e test feature Auth', () => {
   it('Create [POST /api/auth/login]', async () => {
     const response = await request(app.getHttpServer())
       .post('/api/auth/login')
-      .send(data_test.user1 as Logindto)
+      .send(data_test.user1 as LoginDto)
       .expect(201);
 
     accessToken = response.body.accessToken;
@@ -199,12 +198,29 @@ describe('E2e test feature Albums', () => {
       .expect(401);
   });
 
+  // Invite contribute
+  it('Create [POST /api/albums/inviteContribute]', async () => {
+    await request(app.getHttpServer())
+      .post(`/api/albums/inviteContribute`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .send({ id: album.id, userContribueId: user2.id })
+      .expect(201);
+  });
+
+  it('Create [POST /api/albums/inviteContribute]', async () => {
+    await request(app.getHttpServer())
+      .post(`/api/albums/inviteContribute`)
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .send({ id: user1.id, userContribueId: user2.id })
+      .expect(400);
+  });
+
   // Update Albums
   it('Create [PATCH /api/albums/:id]', async () => {
     await request(app.getHttpServer())
       .patch(`/api/albums/${album.id}`)
       .set({ Authorization: `Bearer ${accessToken}` })
-      .send(data_test.albumUpdate as UpdateAlbumdto)
+      .send(data_test.albumUpdate as UpdateAlbumDto)
       .expect(200);
   });
 
@@ -212,7 +228,7 @@ describe('E2e test feature Albums', () => {
     await request(app.getHttpServer())
       .patch(`/api/albums/${null}`)
       .set({ Authorization: `Bearer ${accessToken}` })
-      .send(data_test.albumUpdate as UpdateAlbumdto)
+      .send(data_test.albumUpdate as UpdateAlbumDto)
       .expect(400);
   });
 
@@ -220,7 +236,7 @@ describe('E2e test feature Albums', () => {
     await request(app.getHttpServer())
       .patch(`/api/albums/${album.id}`)
       .set({ Authorization: 'Bearer' })
-      .send(data_test.albumUpdate as UpdateAlbumdto)
+      .send(data_test.albumUpdate as UpdateAlbumDto)
       .expect(401);
   });
 });
@@ -326,7 +342,7 @@ describe('E2e test feature Photos', () => {
 
   // Update Photo
   it('Create [PATCH /api/photos/:id]', async () => {
-    request(app.getHttpServer())
+    await request(app.getHttpServer())
       .patch(`/api/photos/${photo.id}`)
       .set({ Authorization: `Bearer ${accessToken}` })
       .send(data_test.photoUpdate)
@@ -510,34 +526,49 @@ describe('E2e test feature Comments', () => {
 });
 
 //===========================================================================
-// Feature Follows
-describe('E2e test feature Follows', () => {
-  // Create Follow
-  it('Create [POST /api/follows]', async () => {
+// Feature FollowUsers
+describe('E2e test feature FollowUsers', () => {
+  // Create FollowUser
+  it('Create [POST /api/followUsers]', async () => {
     await request(app.getHttpServer())
-      .post('/api/follows')
+      .post('/api/followUsers')
       .set({ Authorization: `Bearer ${accessToken}` })
       .send({ userIdFollowing: user2.id })
       .expect(201);
   });
 
-  it('Create [POST /api/follows] 400 Bad Request', async () => {
+  it('Create [POST /api/followUsers] 400 Bad Request', async () => {
     await request(app.getHttpServer())
-      .post('/api/follows')
+      .post('/api/followUsers')
       .set({ Authorization: `Bearer ${accessToken}` })
       .send(null)
       .expect(400);
   });
 
-  it('Create [POST /api/follows] 401 Unauthorization', async () => {
+  it('Create [POST /api/followUsers] 401 Unauthorization', async () => {
     await request(app.getHttpServer())
-      .post('/api/follows')
+      .post('/api/followUsers')
       .set({ Authorization: 'Bearer' })
       .send({ userIdFollowing: user2.id })
       .expect(401);
   });
+
+  it('Create [GET /api/allFollowing]', async () => {
+    await request(app.getHttpServer())
+      .get('/api/followUsers/allFollowing')
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .expect(200);
+  });
+
+  it('Create [GET /api/followUsers/allFollower]', async () => {
+    await request(app.getHttpServer())
+      .get('/api/followUsers/allFollower')
+      .set({ Authorization: `Bearer ${accessToken}` })
+      .expect(200);
+  });
 });
 
+// ===========================================================
 describe('E2e test feature Photos', () => {
   // Delete Photo
   it('Create [DELETE /api/photos/:id]', async () => {
@@ -594,7 +625,7 @@ describe('E2e test feature Users', () => {
     await request(app.getHttpServer())
       .patch(`/api/users`)
       .set({ Authorization: `Bearer ${accessToken}` })
-      .send(data_test.userUpdate1 as UpdateInfordto)
+      .send(data_test.userUpdate1 as UpdateInforDto)
       .expect(200);
   });
 
@@ -610,28 +641,28 @@ describe('E2e test feature Users', () => {
     await request(app.getHttpServer())
       .patch(`/api/users`)
       .set({ Authorization: 'Bearer' })
-      .send(data_test.userUpdate1 as UpdateInfordto)
+      .send(data_test.userUpdate1 as UpdateInforDto)
       .expect(401);
   });
 
   // Get One User
-  it('Create [GET /api/users/one/:id]', async () => {
+  it('Create [GET /api/users/getOne/:id]', async () => {
     await request(app.getHttpServer())
-      .get(`/api/users/one/${user1.id}`)
+      .get(`/api/users/getOne/${user1.id}`)
       .set({ Authorization: `Bearer ${accessToken}` })
       .expect(200);
   });
 
-  it('Create [GET /api/users/one  /:id] 400 Bad Request', async () => {
+  it('Create [GET /api/users/getOne/:id] 400 Bad Request', async () => {
     await request(app.getHttpServer())
-      .get(`/api/users/one/${'id'}`)
+      .get(`/api/users/getOne/${'id'}`)
       .set({ Authorization: `Bearer ${accessToken}` })
       .expect(400);
   });
 
-  it('Create [GET /api/users/one/:id] 401 Unauthorization', async () => {
+  it('Create [GET /api/users/getOne/:id] 401 Unauthorization', async () => {
     await request(app.getHttpServer())
-      .get(`/api/users/one/${user1.id}`)
+      .get(`/api/users/getOne/${user1.id}`)
       .set({ Authorization: 'Bearer' })
       .expect(401);
   });
@@ -671,7 +702,7 @@ describe('E2e test feature Users', () => {
     await request(app.getHttpServer())
       .patch('/api/users/changePassword')
       .set({ Authorization: 'Bearer' })
-      .send(data_test.userChangePassword1 as ChangePassworddto)
+      .send(data_test.userChangePassword1 as ChangePasswordDto)
       .expect(401);
   });
 
@@ -679,7 +710,7 @@ describe('E2e test feature Users', () => {
     await request(app.getHttpServer())
       .patch('/api/users/changePassword')
       .set({ Authorization: `Bearer ${accessToken}` })
-      .send(data_test.userChangePassword1 as ChangePassworddto)
+      .send(data_test.userChangePassword1 as ChangePasswordDto)
       .expect(200);
   });
 

@@ -6,7 +6,7 @@ export enum Status {
   Active = 'Active',
 }
 
-export class UpdateInfordto {
+export class UpdateInforDto {
   @ApiProperty({ example: 'Iris123' })
   username: string;
 
@@ -17,12 +17,12 @@ export class UpdateInfordto {
   status: Status;
 }
 
-export class SearchUserdto {
+export class SearchUserDto {
   @ApiProperty({ nullable: true })
   username: string;
 }
 
-export class GetAllUserdto {
+export class GetAllUserDto {
   @ApiProperty({ nullable: true })
   filter: string;
 
@@ -33,14 +33,14 @@ export class GetAllUserdto {
   page: number;
 }
 
-export class GetOneUserdto {
+export class GetOneUserDto {
   @ApiProperty({ nullable: true })
   @IsUUID()
   @IsNotEmpty()
   id: string;
 }
 
-export class ChangePassworddto {
+export class ChangePasswordDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
@@ -54,7 +54,7 @@ export class ChangePassworddto {
   newPassword: string;
 }
 
-export class DeleteOneUser {
+export class DeleteOneUserDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsUUID()
